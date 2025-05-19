@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { AnimatePresence, motion,  } from "framer-motion";
 import { useState } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
