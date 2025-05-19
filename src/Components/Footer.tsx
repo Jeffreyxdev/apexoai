@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
         </div>
         <Divider className="my-8 bg-gray-700" />
         <div className="text-center text-gray-400">
-          <p>© 2025 Apexo AI. All rights reserved.</p>
+          <p>© 2025 BuildFrica. All rights reserved.</p>
         </div>
       </div>
     </footer>
