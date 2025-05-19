@@ -4,6 +4,7 @@ import NotFound from "./Pages/NotFound"
 import { ToastContainer } from "react-toastify"
 import Login from "./Pages/Login"
 import Signup from "./Pages/Signup"
+import Waitlist from "./Pages/Waitlist"
 const App = () => {
   return (
     <div>
@@ -12,6 +13,7 @@ const App = () => {
         <Route path="/" element={<Home/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/signup" element={<Signup/>}/>
+        <Route path="/waitlist" element={<Waitlist/>}/>
           <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
