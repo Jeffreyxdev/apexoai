@@ -18,10 +18,10 @@ const Navbar = () => {
   };
  return (
     <>
-    <nav className="flex  h-[50px] ml-[30vw] mt-3 fixed nav-full justify-between items-center p-4 text-black bg-white/90   sm:px-6  rounded-full max-w-6.5xl mx-auto mb-10 z-60">
+    <nav className="flex  h-[50px] ml-[25vw] mt-3  w-[50vw] fixed nav-full justify-between items-center p-4 text-black bg-white/90   sm:px-6  rounded-full max-w-6.5xl mx-auto mb-10 z-60">
       {/* Logo */}
       <div className="flex items-center">
-        <div className="h-9  rounded-full  mt-[-4.5vh] mr-[-1vw]"> <img src={Logo} alt="logo for page" className=" h-[9vh]  " /></div>
+        <div className="h-9  rounded-full  mt-[-4.5vh] mr-[-1vw] "> <img src={Logo} alt="logo for page" className=" h-[9vh]  " /></div>
         <div className="flex items-center">
          
         </div>
@@ -30,7 +30,7 @@ const Navbar = () => {
       </div>
 
       {/* Navigation Links */}
-      <div className="hidden sm:flex space-x-4 text-sm font-medium">
+      <div className="hidden sm:flex space-x-4 text-sm font-medium mt-1">
         <a href="#" className="hover:underline">Use Cases</a>
         <a href="#" className="hover:underline">Features</a>
         <a href="#" className="hover:underline">Resources</a>
@@ -41,7 +41,7 @@ const Navbar = () => {
       {/* Buttons */}
       <div className=" hidden sm:flex space-x-3">
         
-        <Link to={'/signup'}><button className="bg-black text-white  rounded-[50px] h-10 hover:opacity-80 transition btn">
+        <Link to={'/signup'}><button className="bg-black text-white  rounded-[50px] h-10   hover:opacity-80 transition btn">
           Sign Up
         </button></Link>
         <button className=" bg-black  rounded-full h-10 hover:opacity-80 transition text-white btn">
