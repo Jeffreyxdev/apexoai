@@ -48,54 +48,45 @@ const Waitlist = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-t from-[#040116] to-[#050118] min-h-screen font-poppins">
-        <div className="relative min-h-screen flex items-center justify-center">
-          <div
-            className="bg-white border border-blue-100 rounded-2xl shadow-xl w-[400px] p-6 relative z-10"
-            style={{ boxShadow: '0px 0px 20px rgba(0, 89, 255, 0.2)' }}
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-12">
+      <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-lg text-center">
+        <p className="text-sm text-gray-400 mb-2">ApexoAI | Job hunting with ease </p>
+        <h2 className="text-2xl font-semibold mb-1">
+         You’re Not Early,
+        </h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 bg-clip-text text-transparent mb-6">
+          You’re First. Join the Apexo AI Waitlist
+        </h2>
+<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full name..."
+            value={form.name}
+            onChange={handleChange}
+            className="bg-black/40 border border-white/20 p-3 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Address email..."
+            value={form.email}
+            onChange={handleChange}
+            className="bg-black/40 border border-white/20 p-3 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          />
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg transition"
           >
-            {/* Mac-style buttons */}
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-            </div>
-<a href="https://x.com/apexoai" target="_blank" rel="noopener noreferrer"> <FaXTwitter className="text-black text-xl mb-4 float-right mt-[-4vh]" /></a>
-           
+            Join the waitlist →
+          </button>
+        </form>
 
-            <h2 className="text-2xl font-semibold text-center mb-6 text-black">
-              Join the <span className="text-blue-600 font-bold">Waitlist</span>
-            </h2>
-
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black">
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter Full Name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                className="border border-blue-800 rounded-xl p-2 px-4 focus:outline-none"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter Email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="border border-blue-800 rounded-xl p-2 px-4 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="bg-blue-800 text-white font-semibold py-2 rounded-xl hover:bg-blue-900 transition"
-              >
-                Join Now
-              </button>
-            </form>
           </div>
         </div>
-      </div>
+     
 
       {/* Toast Notification Container */}
       
