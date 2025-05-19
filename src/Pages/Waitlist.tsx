@@ -58,7 +58,7 @@ const Waitlist = () => {
          You’re Not Early,You are the First.
         </h3>
         
-<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+<form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <input
             type="text"
             name="name"
