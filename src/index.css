@@ -26,6 +26,7 @@ a:hover {
 }
 .btn{
   border-radius: 50px;
+  padding: auto;
 }
 body {
   font-family: 'Poppins', sans-serif;
@@ -85,12 +86,21 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+}.bng{
+      max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  }
 @media screen and (max-width: 800px) {
   .subIndex {
     flex-direction: column;
     overflow-x: hidden;
     
+  }
+  .bgc{
+    width: 60px; /* You can adjust width here */
+  height: auto;
   }
   .spin-slow{
     margin-left: 120px;

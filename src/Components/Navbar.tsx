@@ -18,7 +18,7 @@ const Navbar = () => {
   };
  return (
     <>
-    <nav className="flex  nav-full justify-between items-center p-4 text-black bg-white">
+    <nav className="flex  h-[50px] ml-[30vw] mt-3 fixed nav-full justify-between items-center p-4 text-black bg-white/90   sm:px-6  rounded-full max-w-6.5xl mx-auto mb-10 z-60">
       {/* Logo */}
       <div className="flex items-center">
         <div className="h-9  rounded-full  mt-[-4.5vh] mr-[-1vw]"> <img src={Logo} alt="logo for page" className=" h-[9vh]  " /></div>
@@ -30,7 +30,7 @@ const Navbar = () => {
       </div>
 
       {/* Navigation Links */}
-      <div className="space-x-6">
+      <div className="hidden sm:flex space-x-4 text-sm font-medium">
         <a href="#" className="hover:underline">Use Cases</a>
         <a href="#" className="hover:underline">Features</a>
         <a href="#" className="hover:underline">Resources</a>
@@ -39,12 +39,12 @@ const Navbar = () => {
       </div>
 
       {/* Buttons */}
-      <div className="space-x-4">
+      <div className=" hidden sm:flex space-x-3">
         
-        <button className="bg-black text-white px-4 py-2 rounded-[50px] h-10 hover:opacity-80 transition btn"><Link to={'/signup'}>
-          Sign Up</Link>
-        </button>
-        <button className=" bg-black px-4 py-2 rounded-full h-10 hover:opacity-80 transition text-white btn">
+        <Link to={'/signup'}><button className="bg-black text-white  rounded-[50px] h-10 hover:opacity-80 transition btn">
+          Sign Up
+        </button></Link>
+        <button className=" bg-black  rounded-full h-10 hover:opacity-80 transition text-white btn">
           Log In
         </button>
 
@@ -54,7 +54,7 @@ const Navbar = () => {
      {/* Mobile Nav Toggle */}
       <nav className="md:hidden flex justify-center fixed z-20  w-full h-[8vh] backdrop-blur-sm">
         <div className="nav-container pt-5 flex justify-between w-[90%]">
-         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">apexoai</h3>
+         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">apexoi</h3>
           <div onClick={handleMobileMenuToggle}>
             {isMobileMenuOpen ? (
               <MdOutlineClose className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-2vh]" />

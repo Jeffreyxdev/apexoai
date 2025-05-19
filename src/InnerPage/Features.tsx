@@ -46,28 +46,29 @@ const features = [
 
 const Features: React.FC = () => {
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-gradient-to-t from-[#24002b] to-[#030015]">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
             How Apexo Helps You
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-white/95 max-w-2xl mx-auto">
             Our comprehensive suite of tools and resources designed to make your job search seamless and successful
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {features.map((feature, index) => (
-            <Card key={index} className="border border-gray-200 rounded-xl hover:shadow-lg transition-shadow">
-              <CardContent className="p-8">
-                <div className="mb-6">{feature.icon}</div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8  backdrop-blur-md rounded-2xl p-4 shadow-inner">
+  {features.map((feature, index) => (
+    <div key={index} className="border border-white/20 rounded-xl hover:shadow-xl transition-shadow backdrop-blur-lg">
+      <CardContent className="p-6 rounded-xl">
+        <div className="mb-4">{feature.icon}</div>
+        <h3 className="text-xl font-bold mb-2 text-white">{feature.title}</h3>
+        <p className="text-white/90">{feature.description}</p>
+      </CardContent>
+    </div>
+  ))}
+</div>
+
       </div>
     </section>
   );

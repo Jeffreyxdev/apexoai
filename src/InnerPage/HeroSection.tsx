@@ -1,30 +1,23 @@
 import React from "react";
-
-import { ArrowRight } from "lucide-react";
-
+import { Link } from "react-router-dom";
+import bgimg from '../assets/apexo back page.jpg'
 const HeroSection: React.FC = () => {
   return (
-    <div className="relative min-h-[1vh] min-w-[2vw] bg-white pt-20 overflow-hidden">
-      <div className="absolute bottom-0 inset-0 bg-gradient-to-b from-blue-900 via-blue-600 to-blue-400 rounded-[50px] z-0"></div>
-      <div className="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center min-h-[90vh]  text-white">
-        
-            
-        
-        
-     
-
-        <h1 className="text-4xl md:text-7xl font-bold text-center mb-4 tracking-tight">
+    <div className="relative   bg-gradient-to-t from-[#030015] to-[#0c0722] pt-20 overflow-hidden">
+      <div className="absolute bottom-0 inset-0 rounded-[50px] bgc"><img src={bgimg} alt=""  className="bng  object-contain"/></div>
+      <div className="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center min-h-[90vh]  text-white text-center space-y-4 sm:flex">
+        <h1 className="text-8xl sm:text-5xl font-bold tracking-tight ">
           Introducing apexoai
         </h1>
-        <p className="text-xl md:text-2xl mb-10 text-center max-w-3xl">
+        <p className="text-lg sm:text-xl text-gray-30l">
           Revolutionizing Careers with Smart Resume and Job Matching
         </p>
-        <button className="bg-white text-blue-700 hover:bg-gray-100 rounded-full px-8 py-6 text-lg font-medium flex items-center">
-          Get employed <ArrowRight className="ml-2 h-5 w-5" />
+        <button className="bg-white text-blue-700 hover:bg-gray-100 rounded-full  text-lg font-medium flex items-center"><Link to='/signup'>
+          Get employed ↗</Link>
         </button>
 
-        <div className="mt-24 bg-white/10 backdrop-blur-sm rounded-2xl p-10 w-full max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div className="mt-24 container bg-white/10 backdrop-blur-sm rounded-2xl p-10 w-full max-w-4xl max-h-4xl sm:flex">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center  text-sm">
             <div className="p-6">
               <h2 className="text-4xl md:text-5xl font-bold mb-2">60,000+</h2>
               <p className="text-sm md:text-base">
