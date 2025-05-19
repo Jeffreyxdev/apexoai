@@ -2,17 +2,16 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import {BrowserRouter as Router} from "react-router-dom";
 
+const rootElement = document.getElementById('root');
 
-import React from 'react';
-
-
-
-const container = document.getElementById('root');
-const root = createRoot(container!);
-
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+if (rootElement) {
+  createRoot(rootElement).render(
+    <Router>
+      <App />
+    </Router>
+  );
+} else {
+  console.error("Root element not found");
+}
