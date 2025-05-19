@@ -52,7 +52,7 @@ const Navbar = () => {
       </div>
     </nav>
      {/* Mobile Nav Toggle */}
-      <nav className="md:hidden flex justify-center fixed z-10  w-[90vw] h-[15vh] ">
+      <nav className="md:hidden flex justify-center fixed z-20  w-full h-[8vh] backdrop-blur-sm">
         <div className="nav-container pt-5 flex justify-between w-[90%]">
          <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">apexoAI</h3>
           <div onClick={handleMobileMenuToggle}>
@@ -60,7 +60,7 @@ const Navbar = () => {
               <MdOutlineClose className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-2vh]" />
             ) : (
               <div className="flex justify-center items-center h-[100%] pb-9">
-                <IoMdMenu className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-4vh] mr-[-6vw]" />
+                <IoMdMenu className="w-[40px] h-[40px] p-2 cursor-pointer " />
               </div>
             )}
           </div>
@@ -84,7 +84,7 @@ const Navbar = () => {
               animate="open"
               exit="closed"
               variants={sideVariants}
-              className="container md:hidden flex flex-col fixed bg-[#272727] text-white w-[60vw] ml-[35vw] mt-[10vh] h-[350px] mr-[-3vw]   rounded-2xl pt-4 z-10"
+              className="container md:hidden flex flex-col fixed bg-[#ffffff] text-black w-[60vw] ml-[35vw] mt-[10vh] h-[350px] mr-[-4vw] z-20  rounded-2xl pt-4 "
             >
               <ul className="text-[20px] mr-[-20px] p-5" onClick={handleMobileMenuToggle}>
                 <motion.li variants={itemVariants} className="mb-6">
@@ -104,7 +104,7 @@ const Navbar = () => {
               <Link to="/waitlist">
                 <motion.button
                   variants={itemVariants}
-                  className="w-[150px] h-[48px] bg-[#272727a9] text-white rounded-xl text-[14px]  "
+                  className="w-[190px] h-[48px]  bg-blue-400  text-white rounded-xl text-[14px] ml-5"
                 >
                   Request Demo
                 </motion.button>
