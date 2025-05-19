@@ -18,14 +18,7 @@
 html{
   scroll-behavior: smooth;
 }
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+
 .btn{
   border-radius: 50px;
   padding: auto;
