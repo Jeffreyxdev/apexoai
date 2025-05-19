@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
+import { Input } from './Input'
+
 import { Eye, EyeOff } from "lucide-react";
 import SocialButton from "./SocialButton";
 import { IoLogoGoogle ,IoLogoLinkedin } from "react-icons/io";
 
-  import {  toast } from 'react-toastify';
-
+import {  toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,7 +32,13 @@ const SignupForm = () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       toast(
        
-        "Please fill in all fields",
+          <div className="">
+    <h4 className="font-bold text-red-500">Please Fill in all Field</h4>
+
+  </div>,
+  {
+    className: "bg-white border border-blue-500", // Background and border
+  }
         
       );
       return;
@@ -38,7 +46,13 @@ const SignupForm = () => {
     
     // Form validation would go here
     toast(
-      "Account created!"
+       <div className="">
+    <h4 className="font-bold text-green-400">Account created!</h4>
+    <p className="text-sm text-black">You have successfully signed up.</p>
+  </div>,
+  {
+    className: "bg-white border border-blue-500", // Background and border
+  }
       
     );
     
@@ -63,10 +77,10 @@ const SignupForm = () => {
       </div>
       
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 gap-4 mb-4">
           <div>
             <label htmlFor="firstName" className="block text-sm text-gray-400 mb-1">First Name</label>
-            <input 
+            <Input 
               id="firstName"
               name="firstName"
               value={formData.firstName}
@@ -77,20 +91,20 @@ const SignupForm = () => {
           </div>
           <div>
             <label htmlFor="lastName" className="block text-sm text-gray-400 mb-1">Last Name</label>
-            <input 
+            <Input 
               id="lastName"
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
               placeholder="eg. Francisco"
-              className="bg-transparent border-white/20 text-white"
+              className="bg-transparent border-white/20 text-white "
             />
           </div>
         </div>
         
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm text-gray-400 mb-1">Email</label>
-          <input 
+          <Input 
             id="email"
             name="email"
             type="email"
@@ -104,7 +118,7 @@ const SignupForm = () => {
         <div className="mb-4">
           <label htmlFor="password" className="block text-sm text-gray-400 mb-1">Password</label>
           <div className="relative">
-            <input 
+            <Input 
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}

@@ -41,8 +41,8 @@ const Navbar = () => {
       {/* Buttons */}
       <div className="space-x-4">
         
-        <button className="bg-black text-white px-4 py-2 rounded-[50px] h-10 hover:opacity-80 transition btn">
-          Sign Up
+        <button className="bg-black text-white px-4 py-2 rounded-[50px] h-10 hover:opacity-80 transition btn"><Link to={'/signup'}>
+          Sign Up</Link>
         </button>
         <button className=" bg-black px-4 py-2 rounded-full h-10 hover:opacity-80 transition text-white btn">
           Log In
@@ -54,7 +54,7 @@ const Navbar = () => {
      {/* Mobile Nav Toggle */}
       <nav className="md:hidden flex justify-center fixed z-20  w-full h-[8vh] backdrop-blur-sm">
         <div className="nav-container pt-5 flex justify-between w-[90%]">
-         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">apexoAI</h3>
+         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">apexoai</h3>
           <div onClick={handleMobileMenuToggle}>
             {isMobileMenuOpen ? (
               <MdOutlineClose className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-2vh]" />
