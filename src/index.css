@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+.btn{
+  border-radius: 50px;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 20px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: 'Poppins';
+ 
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+@media screen and (max-width: 800px) {
+  .subIndex {
+    flex-direction: column;
+    overflow-x: hidden;
+    
+  }
+  .spin-slow{
+    margin-left: 120px;
+    width: 80vw;
+  }
+  .nav-full {
+    display: none;
+  }
+  .index-container {
+    text-align: center;
+    padding: 3vw;
+    margin-left: 4vw;
+  }
+  .index-container > h2 {
+    font-size: 40px;
+    max-width: 75vw;
+    margin-left: 120px;
+  }
+  .index-container > p {
+    width: 70vw;
+    margin-left: 120px;
+  }
+}
+
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .subIndex {
+    flex-direction: column;
+    overflow-x: hidden;
+    margin-left: -40px;
+  }
+  .nav-full > div {
+    width: 90%;
+  }
+  .nav-full > div > ul {
+    margin-top: .5rem;
+  }
+  .index-container {
+    text-align: center;
+    padding-left: 3vw;
+  }
+  .spin-slow{
+    margin-left: -60px;
+  }
+  .index-container > h2 {
+    font-size: 45px;
+    width: 88vw;
+  }
+  .index-container > p {
+    width: 70vw;
+    padding-left: 10rem;
+  }
+}
