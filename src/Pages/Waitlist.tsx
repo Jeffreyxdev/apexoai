@@ -51,12 +51,13 @@ const Waitlist = () => {
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-12">
       <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-lg text-center">
         <p className="text-sm text-gray-400 mb-2">ApexoAI | Job hunting with ease </p>
-        <h2 className="text-2xl font-semibold mb-1">
-         You’re Not Early,
-        </h2>
         <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 bg-clip-text text-transparent mb-6">
-          You’re First. Join the Apexo AI Waitlist
+           Join the Apexo AI Waitlist
         </h2>
+        <h3 className=" font-medium mb-1">
+         You’re Not Early,You are the First.
+        </h3>
+        
 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
