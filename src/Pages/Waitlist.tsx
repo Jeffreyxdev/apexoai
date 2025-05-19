@@ -54,8 +54,9 @@ const Waitlist = () => {
         <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 bg-clip-text text-transparent mb-6">
            Join the Apexo AI Waitlist
         </h2>
-        <h3 className=" font-medium mb-1">
-         You’re Not Early,You are the First.
+        <h3 className="text-xl font-medium mb-1">You’re Not Early,</h3>
+        <h3 className="text-1xl font-medium mb-1">
+         You are the First.
         </h3>
         
 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -82,12 +83,23 @@ const Waitlist = () => {
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg transition"
           >
             Join the waitlist →
-          </button>
+          </button><div className="mt-8 flex justify-center text-gray-300">
+  <a
+    href="https://x.com/apexoai"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center space-x-2 font-medium"
+  >
+    <h3>Connect with us</h3>
+    <FaXTwitter />
+  </a>
+</div>
+
         </form>
 
           </div>
         </div>
-     
+       
 
       {/* Toast Notification Container */}
       
