@@ -1,54 +1,31 @@
-# React + TypeScript + Vite
+# ApexoAI   
+Your AI-powered career assistant — find jobs, get insights, and grow professionally.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+**ApexoAI** is a smart job board and career platform that leverages artificial intelligence to assist job seekers in finding the right roles, getting tailored career advice, and staying ahead in their job search. From personalized job recommendations to AI-driven CV feedback, ApexoAI is your one-stop hub for professional growth.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+##  Key Features
 
-## Expanding the ESLint configuration
+-  **Job Search:** Browse through curated job listings with filtering by role, location, and skills.
+-  **AI Career Assistant:** Get personalized job recommendations and career advice.
+-  **Resume Feedback:** Upload your CV and get instant feedback from the AI.
+-  **Application Tracker:** Keep track of your job applications and statuses.
+-  **Career Insights:** Learn in-demand skills, salary ranges, and hiring trends.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 Tech Stack
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Frontend:** React, TailwindCSS, ShadCN UI
+- **Backend:** Node.js / Express (or specify your stack)
+- **AI Integration:** OpenAI API (or other AI tools used)
+- **Database:** MongoDB / Firebase / Supabase (update as needed)
+- **Hosting:** Vercel / Netlify / Railway (mention what's used)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Node.js & npm installed
+- Git
+
+
