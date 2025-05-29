@@ -50,7 +50,9 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+.nav-full{
 
+}
 button {
   border-radius: 20px;
   border: 1px solid transparent;
@@ -87,7 +89,7 @@ button:focus-visible {
   display: block;
   object-fit: contain;
   }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 754px) {
   .subIndex {
     flex-direction: column;
     overflow-x: hidden;
@@ -120,7 +122,7 @@ button:focus-visible {
   }
 }
 
-@media screen and (min-width: 801px) and (max-width: 1200px) {
+@media screen and (min-width: 735px) and (max-width: 1200px) {
   .subIndex {
     flex-direction: column;
     overflow-x: hidden;
