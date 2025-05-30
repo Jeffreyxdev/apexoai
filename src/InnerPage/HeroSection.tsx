@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => {
         <p className="text-lg sm:text-xl text-gray-30l">
           Revolutionizing Careers with Smart Resume and Job Matching
         </p>
-        <button className="bg-white text-blue-700 hover:bg-gray-100 rounded-full  text-lg font-medium flex items-center"><Link to='/signup'>
+        <button className="bg-white btn text-blue-700 hover:bg-gray-100 rounded-full  text-lg font-medium flex items-center"><Link to='/resume'>
           Get employed ↗</Link>
         </button>
 
