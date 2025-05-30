@@ -7,6 +7,7 @@ const puppeteer = require('puppeteer');
 const cors = require('cors');
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai"); // Import Gemini SDK
 const cheerio = require('cheerio');
+const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
