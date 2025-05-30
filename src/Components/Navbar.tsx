@@ -42,7 +42,7 @@ const Navbar = () => {
      {/* Mobile Nav Toggle */}
       <nav className="md:hidden flex justify-center fixed z-20  w-full h-[8vh] backdrop-blur-sm">
         <div className="nav-container pt-5 flex justify-between w-[90%]">
-         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">Apex AI</h3>
+         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">Apexo AI</h3>
           <div onClick={handleMobileMenuToggle}>
             {isMobileMenuOpen ? (
               <MdOutlineClose className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-2vh]" />
