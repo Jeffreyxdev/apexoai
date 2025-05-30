@@ -30,8 +30,8 @@ body {
   flex-direction: row;
   display: flex;
     align-content: center;
-    margin: 13px 0 10vw 20vw;
-    
+    margin: 13px 0 10vw 15vw;
+    width: 70%;
 }
 .Input {
   box-sizing: border-box;
@@ -133,6 +133,9 @@ h1 {
   .nav-full {
     display: none;
   }
+  .nav{
+    display: none;
+  }
   .index-container {
     text-align: center;
     padding: 3vw;
@@ -148,12 +151,35 @@ h1 {
     margin-left: 120px;
   }
 }
-
+@media screen  and (min-width:820px) and (max-width:1194px){
+  .nav{
+    width: 100%;
+  }
+  .nav > div {
+    width: 100%;
+    font-size: medium;
+    
+  }
+  .nav > div > a {
+    width: fit-content;
+   font-weight: 500;
+    font-size: smaller;
+    
+  }
+  .nav  button{
+    width: 10vw;
+    padding-top: -20px;
+  }
+}
 @media screen and (min-width: 735px) and (max-width: 1200px) {
   .subIndex {
     flex-direction: column;
     overflow-x: hidden;
     margin-left: -40px;
+  }
+  .nav{
+    width: 83%;
+    margin-left: 10vw;
   }
   .nav-full > div {
     width: 90%;
