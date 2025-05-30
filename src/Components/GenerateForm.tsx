@@ -8,7 +8,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BeatLoader } from 'react-spinners'; // Import BeatLoader
-import AsideBar from './AsideBar';
+
 
 // Tell PDF.js where to find the worker.
 if (typeof window !== 'undefined') {
@@ -113,7 +113,7 @@ export default function ResumeChat() {
 
   return (
     <>
-    <AsideBar/>
+    
     <div className="bg-[#000000] min-h-[80vh] rounded-2xl p-6 shadow-lg max-w-3xl mx-auto flex flex-col-reverse justify-end">
       <div className="mt-4 rounded-[34px] border border-gray-700 bg-[#f3f3f3] p-3 flex items-center ">
         <button
