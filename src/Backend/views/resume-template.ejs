@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title><%= data.name %> - Resume</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 40px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .header {
+      border-bottom: 2px solid #4B4B4B;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+    .header p {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section h2 {
+      color: #444;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 4px;
+      font-size: 20px;
+    }
+    .job, .edu {
+      margin-bottom: 15px;
+    }
+    .job h3, .edu h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .job p, .edu p {
+      margin: 4px 0;
+    }
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .skill {
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin: 5px 8px 0 0;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1><%= data.name %></h1>
+    <p><%= data.email %> | <%= data.phone %> | <%= data.location %></p>
+    <p><%= data.linkedin %> | <%= data.website %></p>
+  </div>
+
+  <% if (data.summary) { %>
+    <div class="section">
+      <h2>Professional Summary</h2>
+      <p><%= data.summary %></p>
+    </div>
+  <% } %>
+
+  <% if (data.experience && data.experience.length > 0) { %>
+    <div class="section">
+      <h2>Experience</h2>
+      <% data.experience.forEach(function(job) { %>
+        <div class="job">
+          <h3><%= job.title %> - <%= job.company %></h3>
+          <p><%= job.location %> | <%= job.startDate %> - <%= job.endDate || 'Present' %></p>
+          
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <% if (data.education && data.education.length > 0) { %>
+    <div class="section">
+      <h2>Education</h2>
+      <% data.education.forEach(function(school) { %>
+        <div class="edu">
+          <h3><%= school.degree %>, <%= school.institution %></h3>
+          <p><%= school.location %> | <%= school.startDate %> - <%= school.endDate %></p>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <% if (data.skills && data.skills.length > 0) { %>
+    <div class="section">
+      <h2>Skills</h2>
+      <div class="skills">
+        <% data.skills.forEach(function(skill) { %>
+          <div class="skill"><%= skill %></div>
+        <% }); %>
+      </div>
+    </div>
+  <% } %>
+</body>
+</html>

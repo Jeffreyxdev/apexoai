@@ -1,214 +1,143 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+'use client';
 
+import { useState, useRef, useEffect } from 'react';
+import { FaReact, FaPaperclip } from 'react-icons/fa';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 
-// --- Interfaces for Data Structure ---
-interface ExperienceEntry {
-  id: string; // For React key
-  jobTitle: string;
-  company: string;
-  dates: string;
-  description: string;
+// Tell PDF.js where to find the worker.
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 }
 
-interface EducationEntry {
-  id: string; // For React key
-  degree: string;
-  institution: string;
-  dates: string;
-}
+export default function ResumeChat() {
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const [input, setInput] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-interface ResumeData {
-  name: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  github: string;
-  summary: string;
-  experience: ExperienceEntry[];
-  education: EducationEntry[];
-  skills: string; // Comma-separated
-}
+  const sendMessage = async (messageToSend: string = input) => {
+    if (!messageToSend.trim()) return;
 
-const initialResumeData: ResumeData = {
-  name: '',
-  email: '',
-  phone: '',
-  linkedin: '',
-  github: '',
-  summary: '',
-  experience: [{ id: Date.now().toString(), jobTitle: '', company: '', dates: '', description: '' }],
-  education: [{ id: (Date.now() + 1).toString(), degree: '', institution: '', dates: '' }],
-  skills: '',
-};
-
-const ResumeForm: React.FC = () => {
-  const [formData, setFormData] = useState<ResumeData>(initialResumeData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // --- Experience Handlers ---
-  const handleExperienceChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    const updatedExperience = formData.experience.map((item, i) =>
-      i === index ? { ...item, [name]: value } : item
-    );
-    setFormData(prev => ({ ...prev, experience: updatedExperience }));
-  };
-
-  const addExperience = () => {
-    setFormData(prev => ({
-      ...prev,
-      experience: [...prev.experience, { id: Date.now().toString(), jobTitle: '', company: '', dates: '', description: '' }],
-    }));
-  };
-
-  const removeExperience = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      experience: prev.experience.filter(item => item.id !== id),
-    }));
-  };
-
-  // --- Education Handlers ---
-  const handleEducationChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    const updatedEducation = formData.education.map((item, i) =>
-      i === index ? { ...item, [name]: value } : item
-    );
-    setFormData(prev => ({ ...prev, education: updatedEducation }));
-  };
-
-  const addEducation = () => {
-    setFormData(prev => ({
-      ...prev,
-      education: [...prev.education, { id: Date.now().toString(), degree: '', institution: '', dates: '' }],
-    }));
-  };
-
-  const removeEducation = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      education: prev.education.filter(item => item.id !== id),
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    // Filter out empty entries and remove 'id' property before sending to backend
-    const payload = {
-        ...formData,
-        experience: formData.experience
-            .filter(exp => exp.jobTitle || exp.company || exp.description)
-            .map(({ id, ...rest }) => rest), // Remove id
-        education: formData.education
-            .filter(edu => edu.degree || edu.institution)
-            .map(({ id, ...rest }) => rest), // Remove id
-    };
+    const userMessage = { role: 'user', content: messageToSend };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput(''); // Clear input after sending (whether typed or uploaded)
 
     try {
-      // If using Vite proxy, '/api/generate-resume' is correct.
-      // Otherwise, use full URL: 'http://localhost:3001/api/generate-resume'
-      const response = await axios.post('/api/generate-resume', payload, {
-        responseType: 'blob', // Crucial for handling PDF file download
+      const res = await fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: messageToSend }),
       });
 
-      const file = new Blob([response.data], { type: 'application/pdf' });
-      const fileURL = URL.createObjectURL(file);
-      
-      const link = document.createElement('a');
-      link.href = fileURL;
-      const safeName = (formData.name || 'resume').replace(/[^a-z0-9_.-]/gi, '_');
-      link.setAttribute('download', `${safeName}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-
-      link.parentNode?.removeChild(link);
-      URL.revokeObjectURL(fileURL);
-
-    } catch (err: any) {
-      console.error('Error generating resume:', err);
-      let errorMessage = 'Failed to generate PDF. Please try again.';
-      if (err.response && err.response.data) {
-        // If the backend sends a JSON error with responseType: 'blob',
-        // we need to parse the blob as text to get the message.
-        if (err.response.data instanceof Blob && err.response.data.type === "application/json") {
-            try {
-                const errorJson = JSON.parse(await err.response.data.text());
-                errorMessage = errorJson.message || errorMessage;
-            } catch (parseError) { /* Could not parse error blob */ }
-        } else if (typeof err.response.data === 'string') {
-            errorMessage = err.response.data;
-        }
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+      const data = await res.json();
+      const aiMessage = { role: 'assistant', content: data.enhancedSummary };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('AI Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Something went wrong. Please try again.' },
+      ]);
     }
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      if (file.type === 'application/pdf') {
+        try {
+          const pdf = await pdfjsLib.getDocument(new Uint8Array(reader.result as ArrayBuffer)).promise;
+          let fullText = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map((item: any) => item.str).join(' ');
+            fullText += pageText + '\n';
+          }
+          sendMessage(fullText);
+        } catch (error) {
+          console.error("Error reading PDF:", error);
+          sendMessage('Could not read the content of the PDF.');
+        }
+      } else {
+        reader.readAsText(file);
+        reader.onloadend = () => {
+          sendMessage(reader.result as string);
+        };
+      }
+    };
+
+    if (file.type === 'application/pdf') {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
+
+    // Clear the file input so the same file can be uploaded again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <form onSubmit={handleSubmit} className="resume-form">
-      <h2>Personal Information</h2>
-      <label>Full Name:
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-      </label>
-      <label>Email:
-        <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-      </label>
-      <label>Phone: <input type="tel" name="phone" value={formData.phone} onChange={handleChange} /></label>
-      <label>LinkedIn: <input type="url" name="linkedin" value={formData.linkedin} onChange={handleChange} placeholder="https://linkedin.com/in/yourprofile" /></label>
-      <label>GitHub: <input type="url" name="github" value={formData.github} onChange={handleChange} placeholder="https://github.com/yourusername" /></label>
-      <label>Summary: <textarea name="summary" value={formData.summary} onChange={handleChange} rows={5}></textarea></label>
+    <div className="bg-[#121212] min-h-[80vh] rounded-2xl p-6 shadow-lg max-w-3xl mx-auto flex flex-col justify-between">
+      <div className="space-y-4 overflow-y-auto max-h-[70vh] scrollbar-hide">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`p-4 rounded-xl max-w-[85%] ${
+              msg.role === 'user' ? 'bg-[#1f1f1f] self-end' : 'bg-[#3a3a3a] self-start'
+            }`}
+          >
+            <p className="text-sm text-white whitespace-pre-wrap">{msg.content}</p>
+          </div>
+        ))}
+        <div ref={bottomRef} />
+      </div>
 
-      <h2>Experience</h2>
-      {formData.experience.map((exp, index) => (
-        <div key={exp.id} className="form-section dynamic-section">
-          <h4>Experience #{index + 1}</h4>
-          <label>Job Title: <input type="text" name="jobTitle" value={exp.jobTitle} onChange={(e) => handleExperienceChange(index, e)} /></label>
-          <label>Company: <input type="text" name="company" value={exp.company} onChange={(e) => handleExperienceChange(index, e)} /></label>
-          <label>Dates: <input type="text" name="dates" value={exp.dates} onChange={(e) => handleExperienceChange(index, e)} placeholder="e.g., Jan 2020 - Present" /></label>
-          <label>Description (use ; for bullet points in PDF): <textarea name="description" value={exp.description} onChange={(e) => handleExperienceChange(index, e)} rows={3}></textarea></label>
-          {formData.experience.length > 1 && (
-            <button type="button" onClick={() => removeExperience(exp.id)} className="remove-btn">Remove Experience</button>
-          )}
-        </div>
-      ))}
-      <button type="button" onClick={addExperience} className="add-btn">Add Experience</button>
-
-      <h2>Education</h2>
-      {formData.education.map((edu, index) => (
-        <div key={edu.id} className="form-section dynamic-section">
-          <h4>Education #{index + 1}</h4>
-          <label>Degree/Certificate: <input type="text" name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} /></label>
-          <label>Institution: <input type="text" name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} /></label>
-          <label>Dates/Graduation Year: <input type="text" name="dates" value={edu.dates} onChange={(e) => handleEducationChange(index, e)} placeholder="e.g., May 2019" /></label>
-          {formData.education.length > 1 && (
-            <button type="button" onClick={() => removeEducation(edu.id)} className="remove-btn">Remove Education</button>
-          )}
-        </div>
-      ))}
-      <button type="button" onClick={addEducation} className="add-btn">Add Education</button>
-
-      <h2>Skills</h2>
-      <label>Skills (comma-separated):
-        <input type="text" name="skills" value={formData.skills} onChange={handleChange} placeholder="e.g., JavaScript, React, Node.js, Project Management" />
-      </label>
-
-      {error && <p className="error-message">{error}</p>}
-      <button type="submit" disabled={isLoading} className="submit-btn">
-        {isLoading ? 'Generating PDF...' : 'Generate PDF Resume'}
-      </button>
-    </form>
+      {/* Input Area like Ask Gemini */}
+      <div className="mt-4 rounded-lg border border-gray-700 bg-[#1a1a1a] p-3 flex items-center">
+        <button
+          onClick={triggerFileUpload}
+          className="text-gray-400 hover:text-gray-300 mr-3 focus:outline-none"
+        >
+          <FaPaperclip size={20} />
+        </button>
+        <input
+          type="text"
+          className="flex-1 bg-transparent text-white outline-none"
+          placeholder="Ask to enhance your resume summary..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+        />
+        <button
+          onClick={() => sendMessage()}
+          className="bg-gradient-to-r from-[#6e34ff] to-[#a855f7] text-white px-4 py-2 rounded-xl hover:opacity-90 flex items-center gap-2 ml-3"
+        >
+          <FaReact />
+          Send
+        </button>
+        <input
+          type="file"
+          accept=".txt,.pdf,.doc,.docx"
+          onChange={handleFileUpload}
+          className="hidden"
+          ref={fileInputRef}
+        />
+      </div>
+    </div>
   );
-};
-
-export default ResumeForm;
+}

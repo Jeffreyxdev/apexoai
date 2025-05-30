@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify"
 import Login from "./Pages/Login"
 import Signup from "./Pages/Signup"
 import Waitlist from "./Pages/Waitlist"
-import ResumeForm from "./Components/GenerateForm"
+import ResumeChat from "./Components/GenerateForm"
 const App = () => {
   return (
     <div>
@@ -15,7 +15,7 @@ const App = () => {
         <Route path="/login" element={<Login/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/waitlist" element={<Waitlist/>}/>
-         <Route path="/resume" element={<ResumeForm/>}/>
+         <Route path="/resume" element={<ResumeChat/>}/>
           <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
