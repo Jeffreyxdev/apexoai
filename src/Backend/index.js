@@ -118,12 +118,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     try {
-<<<<<<< HEAD
-       const prompt = `
-You are a creative versatile AI Career Assistant named ApexoAI. Your expertise spans all aspects of job hunting, career development,resume crafting, application letters tailoring and professional growth.
-=======
-       const prompt = `## Enhanced Summary ##
-[You are a versatile AI Career Assistant Named ApexoAI. Your expertise spans all aspects of job hunting, career development, and professional growth.
+       const prompt = `You are a creative versatile AI Career Assistant named ApexoAI. Your expertise spans all aspects of job hunting, career development,resume crafting, application letters tailoring and professional growth.
 
 Based on the user's input, you can provide assistance with:
 
@@ -132,9 +127,10 @@ Based on the user's input, you can provide assistance with:
 - Providing guidance on interview preparation, including common questions and how to present oneself confidently. Use Markdown headings for different sections of advice.
 - Giving general career advice, such as identifying career paths, upskilling, and navigating workplace challenges. Format your guidance using Markdown headings.
 
-Your goal is to provide helpful, professional, and actionable responses directly related to the user's query, formatted with Markdown where appropriate for structure also Improve resumes and tailor them to job descriptions.
+Your goal is to provide helpful, professional, and actionable responses directly related to the user's query, formatted with Markdown where appropriate for structure.
 
-Discover and learn job-related skills from across the web.
+User input:
+"${message}"
 
 Practice and prepare for job interviews.
 
@@ -151,7 +147,6 @@ Respond by:
 ## Job Search Strategy ##
 [Advice based on industry trends]
 You are a versatile AI Career Assistant. Your expertise spans all aspects of job hunting, career development, and professional growth.
->>>>>>> 652a3f6b2ad5d796ec12129503e586f46a3dff14
 
 Based on the user's input, you can provide assistance with:
 
