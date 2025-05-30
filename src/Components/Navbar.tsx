@@ -18,7 +18,7 @@ const Navbar = () => {
   };
  return (
     <>
-     <nav className="hidden sm:flex container  h-[45px] mt-3 w-[90%] fixed justify-between items-center p-4 text-black bg-white/90 rounded-full max-w-6xl mx-auto z-50 backdrop-blur-sm">
+     <nav className="hidden sm:flex container ml-[20vw] h-[45px] mt-3 w-[90%] fixed justify-between items-center p-4 text-black bg-white/90 rounded-full max-w-6xl mx-auto z-50 backdrop-blur-sm">
         <div className="flex items-center space-x-2">
           
           <span className="text-xl font-bold">apexoai</span>
