@@ -18,7 +18,7 @@ let geminiProModel;
 if (process.env.GOOGLE_GEMINI_API_KEY) {
     genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY);
     geminiProModel = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash", 
+        model: "gemini-2.0-flash-001", 
         // Optional: Safety settings (adjust as needed)
         safetySettings: [
             {
