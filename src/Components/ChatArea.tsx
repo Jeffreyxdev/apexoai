@@ -47,7 +47,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
       setMessage('');
 
       try {
-        const response = await fetch('https://apexoai.onrender.com/api/chats', {
+        const response = await fetch('https://apexoai.onrender.com/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
