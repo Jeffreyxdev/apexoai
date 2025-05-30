@@ -30,7 +30,7 @@ body {
   flex-direction: row;
   display: flex;
     align-content: center;
-    margin: 13px 0 10vw 15vw;
+    margin: 13px 0 10vw 20vw;
     width: 70%;
 }
 .Input {
