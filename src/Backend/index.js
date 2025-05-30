@@ -6,7 +6,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai"); // Import Gemini SDK
-
+const cheerio = require('cheerio');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -112,12 +112,23 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const { message } = req.body;
-
     if (!message) {
         return res.status(400).json({ error: 'Message is required.' });
     }
 
     try {
+        // --- Web scraping: Get live skills from Indeed Resume Sample page ---
+        const url = 'https://www.indeed.com/career-advice/resume-samples';
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+
+        const scrapedSkills = [];
+        $('h2, h3').each((_, el) => {
+            const skill = $(el).text().trim();
+            if (skill && skill.length < 60) scrapedSkills.push(skill);
+        });
+
+        const liveSkillsSnippet = scrapedSkills.slice(0, 15).join(', '); // Take only top 15 for brevity
        const prompt = `## Enhanced Summary ##
 [You are a versatile AI Career Assistant. Your expertise spans all aspects of job hunting, career development, and professional growth.
 
@@ -136,11 +147,14 @@ Practice and prepare for job interviews.
 
 Get personalized advice on career paths, networking, and growth]
 
-## Top 3 Skills to Learn ##
-- Skill A from Source (linkedin.com)
-- Skill B from Source (chatgpt.com)
-- Skill C from Source (indeed)
+Based on that, and these live job-related skills fetched from the web (Indeed.com): 
+${liveSkillsSnippet}
 
+Respond by:
+- Enhancing resume content if relevant.
+- Suggesting job crafting skills based on the user's goal.
+- Providing smart job search advice and career growth tips.
+- Responding in structured Markdown with appropriate headers like ## Skills to Learn ## or ## Resume Suggestions ##
 ## Job Search Strategy ##
 [Advice based on industry trends]
 You are a versatile AI Career Assistant. Your expertise spans all aspects of job hunting, career development, and professional growth.
