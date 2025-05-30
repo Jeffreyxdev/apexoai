@@ -136,8 +136,8 @@ Practice and prepare for job interviews.
 
 Get personalized advice on career paths, networking, and growth]
 
-Based on that, and these live job-related skills fetched from the web (Indeed.com): 
-${liveSkillsSnippet}
+Based on that, and these live job-related skills fetched from the web (Indeed.com)
+
 
 Respond by:
 - Enhancing resume content if relevant.
