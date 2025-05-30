@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ChatSidebar from '../Components/ChatSidebar';
+
 import ChatArea from '../Components/ChatArea';
 
 const Chatbot = () => {
@@ -8,12 +8,7 @@ const Chatbot = () => {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-50 to-white">
-      <ChatSidebar 
-        isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        selectedChatId={selectedChatId}
-        onSelectChat={setSelectedChatId}
-      />
+      
       <ChatArea 
         chatId={selectedChatId}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
