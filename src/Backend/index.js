@@ -103,7 +103,7 @@ app.post('/generate-resume', async (req, res) => {
     }
 });
 
-pp.get('/api/chats', async (req, res) => {
+app.get('/api/chats', async (req, res) => {
   try {
     // Logic to fetch the chat history from your database or storage
     const chatHistory = await getChatHistoryFromDatabase(); // Replace with your actual function

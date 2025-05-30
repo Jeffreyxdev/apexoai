@@ -29,7 +29,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('https://apexoai.onrender.com/api/chat'); // Your backend endpoint to get chat history
+        const response = await fetch('https://apexoai.onrender.com/api/chats'); // Your backend endpoint to get chat history
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
