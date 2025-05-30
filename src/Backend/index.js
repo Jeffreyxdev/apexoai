@@ -103,6 +103,39 @@ app.post('/generate-resume', async (req, res) => {
     }
 });
 
+pp.get('/api/chats', async (req, res) => {
+  try {
+    // Logic to fetch the chat history from your database or storage
+    const chatHistory = await getChatHistoryFromDatabase(); // Replace with your actual function
+
+    res.json(chatHistory);
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+});
+
+// --- Helper function to fetch chat history from your database ---
+// Replace this with your actual database query or data retrieval logic
+async function getChatHistoryFromDatabase() {
+  // Example using a hypothetical 'Chat' model with Sequelize or Mongoose
+  // const chats = await Chat.findAll({
+  //   attributes: ['id', 'title', 'createdAt'],
+  //   order: [['createdAt', 'DESC']]
+  // });
+  // return chats.map(chat => ({
+  //   id: chat.id,
+  //   title: chat.title,
+  //   timestamp: chat.createdAt.toISOString(),
+  // }));
+
+  // For now, let's return some mock data from the backend
+  return [
+    { id: 'backend-1', title: 'Backend Chat 1', timestamp: new Date().toISOString() },
+    { id: 'backend-2', title: 'Another Backend Chat', timestamp: new Date(Date.now() - 86400000).toISOString() }, // Yesterday
+    { id: 'backend-3', title: 'Old Backend Chat', timestamp: new Date(Date.now() - 2 * 86400000).toISOString() }, // Two days ago
+  ];
+}
 
 // --- New AI Endpoints using Gemini ---
 

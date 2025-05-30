@@ -6,6 +6,7 @@ import Login from "./Pages/Login"
 import Signup from "./Pages/Signup"
 import Waitlist from "./Pages/Waitlist"
 import ResumeChat from "./Components/GenerateForm"
+import Chatbot from "./Pages/Chatbot"
 const App = () => {
   return (
     <div>
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/waitlist" element={<Waitlist/>}/>
          <Route path="/resume" element={<ResumeChat/>}/>
+         <Route path="/your-personal-ai" element={<Chatbot/>}/>
           <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
