@@ -110,7 +110,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
         )}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <Sparkles size={16} className="text-black" />
+            <Sparkles size={16} className="text-white" />
           </div>
           <h2 className="text-lg font-semibold text-gray-900">
             {chatId ? 'Conversation' : 'Welcome to ApexoAI'}
@@ -119,7 +119,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
       </div>
 
       {/* Messages Area */}
-      <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-6">
+      <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-5">
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />

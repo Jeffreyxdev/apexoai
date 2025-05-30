@@ -18,10 +18,10 @@ const Navbar = () => {
   };
  return (
     <>
-     <nav className="hidden sm:flex container ml-10 h-[45px] mt-3 w-[90%] fixed justify-between items-center p-4 text-black bg-white/90 rounded-full max-w-6xl mx-auto z-50 backdrop-blur-sm">
+     <nav className="hidden sm:flex container nav h-[45px] mt-3 w-[90%] fixed justify-between items-center p-4 text-black bg-white/90 rounded-full max-w-6xl mx-auto z-50 backdrop-blur-sm">
         <div className="flex items-center space-x-2">
           
-          <span className="text-xl font-bold">apexoai</span>
+          <span className="text-xl font-bold">ApexoAI</span>
         </div>
 
         <div className="flex space-x-6 text-sm font-medium">
