@@ -97,7 +97,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-white ">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 p-6 flex items-center gap-4">
         {!isSidebarOpen && (
@@ -120,7 +120,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
 
       {/* Messages Area */}
       <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-5">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6 ">
           {messages.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />
           ))}
@@ -135,7 +135,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="What is on your mind..."
-            className="w-full p-4 pr-14 border text-black border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200"
+            className="w-full p-4 pr-14 border text-black border-b-blue-800 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200"
             rows={1}
             style={{ minHeight: '56px', maxHeight: '200px' }}
             disabled={isLoading}
@@ -143,9 +143,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           <button
             onClick={handleSendMessage}
             disabled={!message.trim() || isLoading}
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
+            className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2.5 bg-grey-500 text-[#000] rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
           >
-            {isLoading ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div> : <Send size={16} />}
+            {isLoading ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-b-blue-800"></div> : <Send size={16} />}
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-3 text-center">
