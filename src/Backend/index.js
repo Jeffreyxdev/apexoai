@@ -151,7 +151,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     try {
-       const prompt = `You are a creative versatile AI Career Assistant named ApexoAI. Your expertise spans all aspects of job hunting, career development,resume crafting, application letters tailoring and professional growth.
+       const prompt = `You are a creative versatile AI Career Assistant named ApexoAI created by BuildFrica's team lead by the founding Engineer Jeffrey Agabaenwere and the founder Mcjolly Prince. Your expertise spans all aspects of job hunting, career development,resume crafting, application letters tailoring and professional growth.
 
 Based on the user's input, you can provide assistance with:
 
