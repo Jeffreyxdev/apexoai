@@ -11,7 +11,7 @@ interface ChatAreaProps {
 interface Message {
   id: string;
   type: 'user' | 'assistant';
-  content: string;
+  content: string; // This will now store HTML or plain text
   timestamp: Date;
 }
 
@@ -22,9 +22,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
   const chatAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // In a real application, you would fetch the message history
-    // for the current chatId here. For this example, we'll just
-    // clear the messages when the chatId changes.
     setMessages([]);
   }, [chatId]);
 
@@ -33,6 +30,28 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // UPDATED: Function to convert Markdown asterisks and hashtags to bold/italic HTML
+  const convertMarkdownToHtml = (text: string): string => {
+    let htmlText = text;
+
+    // First, convert any Markdown headings (e.g., # Heading, ## Subheading, ### Sub-subheading)
+    // to <strong> tags. We need to do this BEFORE converting double asterisks
+    // because some heading content might also contain double asterisks.
+    // The regex captures the content after the hashes and converts it to bold.
+    htmlText = htmlText.replace(/^(#{1,6})\s*(.*)$/gm, '<strong>$2</strong>');
+
+    // Then, convert bold (e.g., **bold**) to <strong> tags
+    // This should run after heading conversion if you want headings to just be bold.
+    htmlText = htmlText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Lastly, convert italics (e.g., *italic*) to <em> tags
+    // This should run after bold conversion to avoid issues with **bold text with *italic* inside**.
+    htmlText = htmlText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    return htmlText;
+  };
+
 
   const handleSendMessage = async () => {
     if (message.trim()) {
@@ -52,7 +71,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message: message }), // Sending just the message to your current backend
+          body: JSON.stringify({ message: message }),
         });
 
         if (!response.ok) {
@@ -66,10 +85,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           setMessages((prevMessages) => [...prevMessages, errorMessage]);
         } else {
           const data = await response.json();
+          const rawAiContent = data.enhancedSummary || 'No response from AI.';
+
+          // --- APPLY MARKDOWN TO HTML CONVERSION HERE ---
+          const formattedAiContent = convertMarkdownToHtml(rawAiContent); // Use the updated function
+          // --- END MARKDOWN TO HTML CONVERSION ---
+
           const assistantMessage: Message = {
             id: Date.now().toString() + '-assistant',
             type: 'assistant',
-            content: data.enhancedSummary || 'No response from AI.', // Assuming 'enhancedSummary' is the key in your backend response
+            content: formattedAiContent, // Store the HTML content
             timestamp: new Date(),
           };
           setMessages((prevMessages) => [...prevMessages, assistantMessage]);
@@ -149,7 +174,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-3 text-center">
-          ApexoAI can make mistakes. Check important info.
+          ApaxoAI can make mistakes. Check important info.
         </p>
       </div>
     </div>
