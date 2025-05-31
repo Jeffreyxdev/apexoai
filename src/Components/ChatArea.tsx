@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Send, Sparkles } from 'lucide-react';
+import { Menu, Send, Sparkles, Download } from 'lucide-react'; // Added Download icon
 import MessageBubble from './MessageBubble';
+
+// Import for PDF generation
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import ResumeDocument from './ResumeDocument'; // Your new ResumeDocument component
+import type{ ResumeData } from '../Components/types/resume'; // Your resume data types
 
 interface ChatAreaProps {
   chatId: string | null;
@@ -19,10 +24,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null); // State for resume data
   const chatAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMessages([]);
+    setResumeData(null); // Clear resume data when chat changes
   }, [chatId]);
 
   useEffect(() => {
@@ -31,7 +38,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
     }
   }, [messages]);
 
-  // UPDATED: Function to convert Markdown asterisks and hashtags to bold/italic HTML
+  // Function to convert Markdown asterisks and hashtags to bold/italic HTML
   const convertMarkdownToHtml = (text: string): string => {
     let htmlText = text;
 
@@ -52,6 +59,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
     return htmlText;
   };
 
+  // Function to check if AI response is structured resume data
+  // This is a crucial part: your AI needs to respond with structured data for resumes
+  const parseResumeFromAiResponse = (response: any): ResumeData | null => {
+    // This is a mock example. In a real scenario, your AI backend
+    // would send a specific JSON structure when asked for a resume.
+    // You'd check for a specific key or format.
+    if (response && response.type === 'resume' && response.data) {
+        return response.data as ResumeData;
+    }
+    return null;
+  };
 
   const handleSendMessage = async () => {
     if (message.trim()) {
@@ -64,6 +82,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
       };
       setMessages((prevMessages) => [...prevMessages, userMessage]);
       setMessage('');
+      setResumeData(null); // Clear previous resume data on new message
 
       try {
         const response = await fetch('https://apexoai.onrender.com/api/chat', {
@@ -85,19 +104,32 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           setMessages((prevMessages) => [...prevMessages, errorMessage]);
         } else {
           const data = await response.json();
-          const rawAiContent = data.enhancedSummary || 'No response from AI.';
 
-          // --- APPLY MARKDOWN TO HTML CONVERSION HERE ---
-          const formattedAiContent = convertMarkdownToHtml(rawAiContent); // Use the updated function
-          // --- END MARKDOWN TO HTML CONVERSION ---
+          // Attempt to parse as resume data
+          const parsedResume = parseResumeFromAiResponse(data);
 
-          const assistantMessage: Message = {
-            id: Date.now().toString() + '-assistant',
-            type: 'assistant',
-            content: formattedAiContent, // Store the HTML content
-            timestamp: new Date(),
-          };
-          setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+          if (parsedResume) {
+            setResumeData(parsedResume); // Store the structured resume data
+            const assistantMessage: Message = {
+              id: Date.now().toString() + '-assistant',
+              type: 'assistant',
+              content: "I've generated a resume for you! Click the button below to download it.",
+              timestamp: new Date(),
+            };
+            setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+          } else {
+            // Fallback to text message, applying Markdown conversion
+            const rawAiContent = data.enhancedSummary || 'No response from AI.';
+            const formattedAiContent = convertMarkdownToHtml(rawAiContent);
+
+            const assistantMessage: Message = {
+              id: Date.now().toString() + '-assistant',
+              type: 'assistant',
+              content: formattedAiContent,
+              timestamp: new Date(),
+            };
+            setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+          }
         }
       } catch (error) {
         console.error('Error sending message:', error);
@@ -149,6 +181,48 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
           {messages.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />
           ))}
+
+          {/* PDF Download Link conditional render */}
+          {resumeData && (
+            <div className="flex justify-start mb-8">
+              <div className="flex items-start gap-4 max-w-4xl w-full">
+                <div className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles size={16} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-50 p-6 rounded-2xl rounded-tl-lg border border-gray-100">
+                    <p className="text-gray-800 leading-relaxed m-0">
+                      I've structured a professional resume for you. Click below to download!
+                    </p>
+                    <div className="mt-4 text-center">
+                      <PDFDownloadLink
+                        document={<ResumeDocument data={resumeData} />}
+                        fileName={`Resume_${resumeData.name.replace(/\s+/g, '_') || 'Generated'}.pdf`}
+                      >
+                        {({ blob, url, loading, error }) => (
+                          <button
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loading}
+                          >
+                            {loading ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                                Generating PDF...
+                              </>
+                            ) : (
+                              <>
+                                <Download size={16} /> Download Resume
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </PDFDownloadLink>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
