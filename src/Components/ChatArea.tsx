@@ -255,11 +255,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
         )}
          
       {/* Phone icon */}
-     
+      <Link to={'https://elevenlabs.io/app/talk-to?agent_id=agent_01jwtxv08bexrt4f6yqvxyyx83'}> 
       <PiPhoneCall
-        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-black cursor-pointer hover:text-blue-600 transition "
+        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-black cursor-pointer hover:text-blue-600 transition"
         size={24}
-      > <Link to={'https://elevenlabs.io/app/talk-to?agent_id=agent_01jwtxv08bexrt4f6yqvxyyx83'}> </Link> </PiPhoneCall>
+      > </PiPhoneCall></Link>
       </button>
 
       
