@@ -5,8 +5,8 @@ import { ToastContainer } from "react-toastify"
 import Login from "./Pages/Login"
 import Signup from "./Pages/Signup"
 import Waitlist from "./Pages/Waitlist"
-import ResumeChat from "./Components/GenerateForm"
 import Chatbot from "./Pages/Chatbot"
+import ResumeForm from "./InnerPage/ResumeForem"
 const App = () => {
   return (
     <div>
@@ -16,9 +16,11 @@ const App = () => {
         <Route path="/login" element={<Login/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/waitlist" element={<Waitlist/>}/>
-         <Route path="/resume" element={<ResumeChat/>}/>
+         <Route path="/resume" element={<ResumeForm/>}/>
          <Route path="/your-personal-ai" element={<Chatbot/>}/>
+
           <Route path="*" element={<NotFound />} />
+
       </Routes>
     </div>
   )

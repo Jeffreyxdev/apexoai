@@ -102,6 +102,30 @@ app.post('/generate-resume', async (req, res) => {
         res.status(500).send('Error generating PDF. Check server logs.');
     }
 });
+app.post('/api/gemini-voice', async (req, res) => {
+  const userInput = req.body.text;
+
+  // Step 1: Gemini generates text
+  const result = await model.generateContent(userInput);
+  const reply = result.response.text();
+
+  // Step 2: ElevenLabs generates voice
+  const voiceResponse = await axios.post(
+    `https://api.elevenlabs.io/v1/text-to-speech/${process.env.VOICE_ID}`,
+    { text: reply },
+    {
+      headers: {
+        'xi-api-key': process.env.ELEVEN_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+    }
+  );
+
+  // Step 3: Send audio
+  res.setHeader('Content-Type', 'audio/mpeg');
+  res.send(voiceResponse.data);
+});
 
 app.get('/api/chats', async (req, res) => {
   try {

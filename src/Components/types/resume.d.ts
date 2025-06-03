@@ -5,12 +5,15 @@ export interface ExperienceItem {
   company: string;
   duration: string;
   description: string;
+  role:string;
+  
 }
 
 export interface EducationItem {
   degree: string;
   institution: string;
   year: string;
+  school:string;
 }
 
 export interface ResumeData {

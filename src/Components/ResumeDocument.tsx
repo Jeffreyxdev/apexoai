@@ -1,125 +1,49 @@
-// src/components/ResumeDocument.tsx
+// components/ResumeCanvasPreview.tsx
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
-import type{ ResumeData, ExperienceItem, EducationItem } from '../Components/types/resume'; // Adjust path
+import type { ResumeData } from '../Components/types/resume';
 
-// Register a font if you want custom fonts for consistency
-// You can download .ttf files and serve them or use Google Fonts links.
-// Font.register({ family: 'Roboto', src: 'https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Mu4mxK.ttf' });
-
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: 'column',
-    backgroundColor: '#FFFFFF',
-    padding: 40,
-    fontFamily: 'Helvetica', // Default font, change if you register one
-  },
-  section: {
-    marginBottom: 15,
-  },
-  header: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 10,
-    fontWeight: 'bold',
-  },
-  contactInfo: {
-    fontSize: 10,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#cccccc',
-    paddingBottom: 4,
-  },
-  paragraph: {
-    fontSize: 11,
-    marginBottom: 5,
-    lineHeight: 1.5,
-  },
-  listItem: {
-    fontSize: 11,
-    marginBottom: 3,
-    lineHeight: 1.3,
-  },
-  subheading: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginBottom: 2,
-  },
-  subtext: {
-    fontSize: 10,
-    marginBottom: 2,
-  },
-});
-
-interface ResumeDocumentProps {
+interface Props {
   data: ResumeData;
 }
 
-const ResumeDocument: React.FC<ResumeDocumentProps> = ({ data }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>{data.name}</Text>
-        <Text style={styles.contactInfo}>
-          {data.email} {data.phone && ` | ${data.phone}`}
-          {data.linkedin && ` | LinkedIn: ${data.linkedin}`}
-          {data.github && ` | GitHub: ${data.github}`}
-        </Text>
-        <Text style={styles.paragraph}>{data.summary}</Text>
-      </View>
+const ResumeCanvasPreview: React.FC<Props> = ({ data }) => {
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 border max-w-2xl mx-auto text-left">
+      <h1 className="text-2xl font-bold text-gray-800">{data.name}</h1>
+      <p className="text-sm text-gray-600">{data.email} | {data.phone}</p>
 
-      {data.experience && data.experience.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Experience</Text>
-          {data.experience.map((item: ExperienceItem, index: number) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text style={styles.subheading}>{item.title}</Text>
-              <Text style={styles.subtext}>{item.company} | {item.duration}</Text>
-              <Text style={styles.listItem}>{item.description}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold text-blue-700">Summary</h2>
+        <p className="text-gray-700">{data.summary}</p>
+      </section>
 
-      {data.education && data.education.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Education</Text>
-          {data.education.map((item: EducationItem, index: number) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text style={styles.subheading}>{item.degree}</Text>
-              <Text style={styles.subtext}>{item.institution} | {item.year}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold text-blue-700">Experience</h2>
+        {data.experience.map((exp, i) => (
+          <div key={i} className="mt-2">
+            <p className="font-bold text-gray-800">{exp.role} - {exp.company}</p>
+            <p className="text-sm text-gray-600">{exp.duration}</p>
+            <p className="text-gray-700">{exp.description}</p>
+          </div>
+        ))}
+      </section>
 
-      {data.skills && data.skills.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Skills</Text>
-          <Text style={styles.paragraph}>{data.skills.join(', ')}</Text>
-        </View>
-      )}
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold text-blue-700">Education</h2>
+        {data.education.map((edu, i) => (
+          <div key={i} className="mt-2">
+            <p className="font-bold text-gray-800">{edu.degree} - {edu.school}</p>
+            <p className="text-sm text-gray-600">{edu.year}</p>
+          </div>
+        ))}
+      </section>
 
-      {data.projects && data.projects.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Projects</Text>
-          {data.projects.map((item, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text style={styles.subheading}>{item.name}</Text>
-              <Text style={styles.listItem}>{item.description}</Text>
-              {item.link && <Text style={styles.subtext}>Link: {item.link}</Text>}
-            </View>
-          ))}
-        </View>
-      )}
-    </Page>
-  </Document>
-);
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold text-blue-700">Skills</h2>
+        <p className="text-gray-700">{data.skills.join(', ')}</p>
+      </section>
+    </div>
+  );
+};
 
-export default ResumeDocument;
+export default ResumeCanvasPreview;
