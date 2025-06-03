@@ -227,7 +227,7 @@ When responding, format all content using Markdown:
 
 Use clear headers in bold texts
 
-Use ** for bold or * for italic formatting.
+
 
 Prioritize bullet points, numbered lists, and sections to enhance readability.
 
