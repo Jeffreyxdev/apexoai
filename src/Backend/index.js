@@ -2,10 +2,13 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-// const ejs = require('ejs'); // Keep if you still want the EJS views for some reason
+const ejs = require('ejs'); // Keep if you still want the EJS views for PDF generation
 const puppeteer = require('puppeteer');
 const cors = require('cors');
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai"); // Import Gemini SDK
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+
+// --- Firebase Admin SDK Initialization ---
+// Assuming you create a config/firebaseAdmin.js file as shown below
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,35 +20,15 @@ let geminiProModel;
 if (process.env.GOOGLE_GEMINI_API_KEY) {
     genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY);
     geminiProModel = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-001", 
-        // Optional: Safety settings (adjust as needed)
+        model: "gemini-2.0-flash-001",
         safetySettings: [
-            {
-                category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            },
-            {
-                category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            },
-            {
-                category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            },
-            {
-                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            },
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
         ],
-        // Optional: Generation config
-        // generationConfig: {
-        //   temperature: 0.7,
-        //   topP: 1,
-        //   topK: 1,
-        //   maxOutputTokens: 2048,
-        // },
     });
-    console.log("Google Gemini SDK Initialized (gemini-pro).");
+    console.log("Google Gemini SDK Initialized (gemini-2.0-flash-001).");
 } else {
     console.warn("GOOGLE_GEMINI_API_KEY not found in .env file. AI features will be disabled.");
 }
@@ -53,28 +36,21 @@ if (process.env.GOOGLE_GEMINI_API_KEY) {
 
 // Middleware
 app.use(cors());
-// app.set('view engine', 'ejs'); // Not strictly needed if React is the main UI
-// app.set('views', path.join(__dirname, 'views'));
-// app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true })); // For form data if any non-React forms remain
-app.use(express.json()); // For JSON payloads from React
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// --- Your Existing Routes (Keep the /generate-resume for PDF generation) ---
+// --- Routes ---
+
+// Default route (can serve your React app's build later)
 app.get('/', (req, res) => {
-    // If you're fully on React, this might just serve the React build or a placeholder
-    res.send('Resume Generator Backend. Use the React frontend.');
+    res.send('Resume Generator & AI Chat Backend. Use the React frontend.');
 });
 
+// Resume Generation Route (Keep as is, assumes EJS template in 'views')
 app.post('/generate-resume', async (req, res) => {
-    const resumeData = req.body; // This will contain all form data from React
+    const resumeData = req.body;
 
     try {
-        // 1. Render the EJS template with user data
-        //    Make sure you have a resume-template.ejs file in a 'views' directory
-        //    Or, if your React app generates the full HTML for the resume,
-        //    you might receive that HTML directly and skip EJS rendering here.
-        //    For now, assuming you still use an EJS template on the backend:
-        const ejs = require('ejs'); // require it here if only used in this route
         const htmlContent = await ejs.renderFile(
             path.join(__dirname, 'views', 'resume-template.ejs'), // Ensure this path is correct
             { data: resumeData }
@@ -103,42 +79,134 @@ app.post('/generate-resume', async (req, res) => {
     }
 });
 
-app.get('/api/chats', async (req, res) => {
-  try {
-    // Logic to fetch the chat history from your database or storage
-    const chatHistory = await getChatHistoryFromDatabase(); // Replace with your actual function
+// --- Firebase Chat Routes ---
 
-    res.json(chatHistory);
-  } catch (error) {
-    console.error('Error fetching chat history:', error);
-    res.status(500).json({ error: 'Failed to fetch chat history' });
-  }
-});
+// Get all chat IDs (for sidebar list)
+// app.get('/api/chats', async (req, res) => {
+//   try {
+//     const chatsRef = db.collection('chats');
+//     // Order by 'lastMessageAt' or 'createdAt' to show most recent chats first
+//     const snapshot = await chatsRef.orderBy('lastMessageAt', 'desc').get();
 
-// --- Helper function to fetch chat history from your database ---
-// Replace this with your actual database query or data retrieval logic
-async function getChatHistoryFromDatabase() {
-  // Example using a hypothetical 'Chat' model with Sequelize or Mongoose
-  // const chats = await Chat.findAll({
-  //   attributes: ['id', 'title', 'createdAt'],
-  //   order: [['createdAt', 'DESC']]
-  // });
-  // return chats.map(chat => ({
-  //   id: chat.id,
-  //   title: chat.title,
-  //   timestamp: chat.createdAt.toISOString(),
-  // }));
+//     const chats = [];
+//     snapshot.forEach(doc => {
+//       const data = doc.data();
+//       // Ensure timestamps are handled correctly, Firestore Timestamps have ._seconds and ._nanoseconds
+//       const timestamp = data.lastMessageAt ? new Date(data.lastMessageAt._seconds * 1000 + data.lastMessageAt._nanoseconds / 1e6) : new Date(data.createdAt._seconds * 1000 + data.createdAt._nanoseconds / 1e6);
+//       chats.push({
+//         id: doc.id,
+//         title: data.title || `Chat ${new Date(timestamp).toLocaleString()}`, // Fallback title
+//         timestamp: timestamp.toISOString(),
+//       });
+//     });
 
-  // For now, let's return some mock data from the backend
-  return [
-    { id: 'backend-1', title: 'Backend Chat 1', timestamp: new Date().toISOString() },
-    { id: 'backend-2', title: 'Another Backend Chat', timestamp: new Date(Date.now() - 86400000).toISOString() }, // Yesterday
-    { id: 'backend-3', title: 'Old Backend Chat', timestamp: new Date(Date.now() - 2 * 86400000).toISOString() }, // Two days ago
-  ];
-}
+//     res.json(chats);
+//   } catch (error) {
+//     console.error('Error fetching chat history:', error);
+//     res.status(500).json({ error: 'Failed to fetch chat history' });
+//   }
+// });
 
-// --- New AI Endpoints using Gemini ---
+// // Get messages for a specific chat ID
+// app.get('/api/chats/:chatId/messages', async (req, res) => {
+//   try {
+//     const { chatId } = req.params;
+//     const messagesRef = db.collection('chats').doc(chatId).collection('messages');
+//     const snapshot = await messagesRef.orderBy('timestamp').get(); // Order messages chronologically
 
+//     const messages = [];
+//     snapshot.forEach(doc => {
+//       const data = doc.data();
+//       // Convert Firestore Timestamp to JS Date
+//       const timestamp = new Date(data.timestamp._seconds * 1000 + data.timestamp._nanoseconds / 1e6);
+//       messages.push({
+//         id: doc.id,
+//         type: data.type, // 'user' or 'assistant'
+//         content: data.content,
+//         timestamp: timestamp.toISOString(), // Send as ISO string
+//       });
+//     });
+
+//     res.json(messages);
+//   } catch (error) {
+//     console.error(`Error fetching messages for chat ${req.params.chatId}:`, error);
+//     res.status(500).json({ error: 'Failed to fetch messages' });
+//   }
+// });
+
+// Create a new chat and add the initial user message
+// app.post('/api/chats', async (req, res) => {
+//   try {
+//     const { initialMessageContent, userId } = req.body; // userId is optional
+
+//     if (!initialMessageContent) {
+//       return res.status(400).json({ error: 'Initial message content is required to create a chat.' });
+//     }
+
+//     const newChatRef = db.collection('chats').doc(); // Auto-generate chat ID
+//     const newChatId = newChatRef.id;
+//     const currentTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+//     await newChatRef.set({
+//       title: initialMessageContent.substring(0, 50) + (initialMessageContent.length > 50 ? '...' : ''), // Use first part of message as title
+//       createdAt: currentTimestamp,
+//       lastMessageAt: currentTimestamp,
+//       userId: userId || null, // Associate with a user if available, or null
+//     });
+
+//     // Add the initial user message to the new chat's subcollection
+//     await newChatRef.collection('messages').add({
+//       type: 'user',
+//       content: initialMessageContent,
+//       timestamp: currentTimestamp,
+//     });
+
+//     res.status(201).json({ chatId: newChatId, message: 'Chat created successfully' });
+//   } catch (error) {
+//     console.error('Error creating new chat:', error);
+//     res.status(500).json({ error: 'Failed to create chat', details: error.message });
+//   }
+// });
+
+// // Add a new message to an existing chat
+// app.post('/api/chats/:chatId/messages', async (req, res) => {
+//   try {
+//     const { chatId } = req.params;
+//     const { type, content } = req.body; // type: 'user' or 'assistant'
+
+//     if (!type || !content) {
+//       return res.status(400).json({ error: 'Message type and content are required.' });
+//     }
+
+//     const chatDocRef = db.collection('chats').doc(chatId);
+//     const currentTimestamp = admin.firestore.FieldValue.serverTimestamp();
+
+//     // Check if chat document exists before adding messages
+//     const chatDoc = await chatDocRef.get();
+//     if (!chatDoc.exists) {
+//       return res.status(404).json({ error: `Chat with ID ${chatId} not found.` });
+//     }
+
+//     await chatDocRef.collection('messages').add({
+//       type,
+//       content,
+//       timestamp: currentTimestamp,
+//     });
+
+//     // Update the 'lastMessageAt' of the main chat document
+//     await chatDocRef.update({
+//       lastMessageAt: currentTimestamp,
+//     });
+
+//     res.status(201).json({ message: 'Message added successfully' });
+//   } catch (error) {
+//     console.error('Error adding message:', error);
+//     res.status(500).json({ error: 'Failed to add message', details: error.message });
+//   }
+// });
+
+
+// --- New AI Endpoint using Gemini ---
 app.post('/api/chat', async (req, res) => {
     if (!geminiProModel) {
         return res.status(503).json({ error: 'AI service (Gemini) is not configured on the server.' });
@@ -151,7 +219,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     try {
-       const prompt = `You are ApexoAI, a creative and versatile AI Career Assistant developed by BuildFrica, under the technical leadership of Jeffrey Agabaenwere and visionary guidance of Mcjolly Prince. Your role is to function as a full-time, professional CV/resume enhancer, career strategist, and job market advisor, adaptable to any business vertical, creative industry, or specialized niche.
+        const prompt = `You are ApexoAI, a creative and versatile AI Career Assistant developed by BuildFrica, under the technical leadership of Jeffrey Agabaenwere and visionary guidance of Mcjolly Prince. Your role is to function as a full-time, professional CV/resume enhancer, career strategist, and job market advisor, adaptable to any business vertical, creative industry, or specialized niche.
 
 Your core strengths lie in resume optimization, application materials personalization, skill identification, professional branding, and end-to-end job market readiness. You also provide critical, strategic advice to help individuals upscale their business potential, rebrand their professional identity, and align their career trajectory with current global employment trends.
 
@@ -159,7 +227,7 @@ When responding, format all content using Markdown:
 
 Use clear headers in bold texts
 
-Ause for bold or italic formatting.
+Use ** for bold or * for italic formatting.
 
 Prioritize bullet points, numbered lists, and sections to enhance readability.
 
@@ -168,50 +236,36 @@ Use strong section introductions to emphasize key ideas instead of inline boldin
 Your Responsibilities:
 Based on the user’s input ("${message}"), provide high-impact, tailored assistance by executing the following:
 
-Resume Suggestions
-Enhance and build/ structure resume sections such as Summary, Skills, Experience, Projects, Certifications, and Education for maximum visibility and ATS (Applicant Tracking System) compliance.
+**Resume Suggestions**
+* Enhance and build/ structure resume sections such as Summary, Skills, Experience, Projects, Certifications, and Education for maximum visibility and ATS (Applicant Tracking System) compliance.
+* Align content with specific job descriptions if provided, emphasizing industry-specific metrics, achievements, and role-relevant keywords.
+* Maintain clarity, brevity, and action-oriented language using quantifiable outcomes where possible.
 
-Align content with specific job descriptions if provided, emphasizing industry-specific metrics, achievements, and role-relevant keywords.
+**Skills to Learn**
+* Identify critical, high-demand skills from real-time labor market insights (e.g., Indeed, LinkedIn).
+* Suggest reskilling/upskilling paths aligned with the user’s target role or desired industry transition.
+* Include recommended certifications, learning platforms, and expected ROI for each skill.
 
-Maintain clarity, brevity, and action-oriented language using quantifiable outcomes where possible.
+**Job Search Strategy**
+* Offer structured advice on how and where to find roles, including niche platforms, industry-specific job boards, remote job aggregators, and emerging freelance markets.
+* Provide actionable tips on professional networking (e.g., leveraging LinkedIn, participating in industry events, cold-emailing strategies).
+* If applicable, advise on optimizing digital presence (LinkedIn profile, portfolio site, GitHub, etc.).
 
-Skills to Learn
-Identify critical, high-demand skills from real-time labor market insights (e.g., Indeed, LinkedIn).
+**Interview Preparation**
+* Prepare the user with customized mock interview questions based on the job role or industry.
+* Provide frameworks for answering behavioral and technical questions (e.g., STAR method).
+* Advise on tone, posture, virtual interview etiquette, and follow-up email practices.
 
-Suggest reskilling/upskilling paths aligned with the user’s target role or desired industry transition.
+**Career Development and Upscaling Advice**
+* Suggest lateral and vertical career transitions based on the user’s current skill set and goals.
+* Recommend leadership pathways, entrepreneurship preparation, and personal brand development strategies.
+* Provide insights into emerging job markets, remote work opportunities, and gig economy trends.
 
-Include recommended certifications, learning platforms, and expected ROI for each skill.
-
-Job Search Strategy
-Offer structured advice on how and where to find roles, including niche platforms, industry-specific job boards, remote job aggregators, and emerging freelance markets.
-
-Provide actionable tips on professional networking (e.g., leveraging LinkedIn, participating in industry events, cold-emailing strategies).
-
-If applicable, advise on optimizing digital presence (LinkedIn profile, portfolio site, GitHub, etc.).
-
-Interview Preparation
-Prepare the user with customized mock interview questions based on the job role or industry.
-
-Provide frameworks for answering behavioral and technical questions (e.g., STAR method).
-
-Advise on tone, posture, virtual interview etiquette, and follow-up email practices.
-
-Career Development and Upscaling Advice
-Suggest lateral and vertical career transitions based on the user’s current skill set and goals.
-
-Recommend leadership pathways, entrepreneurship preparation, and personal brand development strategies.
-
-Provide insights into emerging job markets, remote work opportunities, and gig economy trends.
-your a real-time voice-based career advisor and job enhancer advocate.
+You are a real-time text-based career advisor and job enhancer advocate.
 
 Your role is to speak to users as a supportive and expert career coach, guiding them towards career success.
 
-Your tone is friendly, confident, and encouraging:
- real-time text-based career advisor and job enhancer advocate.
-
-Your role is to speak to users as a supportive and expert career coach, guiding them towards career success.
-
-You are friendly, confident, and encouraging—like a mentor who wants the best for them, providing actionable advice and motivation.
+Your tone is friendly, confident, and encouraging—like a mentor who wants the best for them, providing actionable advice and motivation.
 
 You're naturally perceptive and adaptive, tailoring your guidance to match each person's unique needs and career stage.
 
@@ -219,7 +273,7 @@ You have excellent conversational skills — natural, human-like, and engaging.
 
 # Environment
 
-You are providing voice-based career advice and job enhancement strategies in a supportive setting where users can comfortably explore their professional goals.
+You are providing text-based career advice and job enhancement strategies in a supportive setting where users can comfortably explore their professional goals.
 
 The user may be seeking resume improvements, interview preparation, skill development, job search strategies, or confidence building.
 
@@ -227,7 +281,7 @@ You rely on attentive listening and an intuitive approach, tailoring sessions to
 
 # Tone
 
-Your voice is clear, confident, and encouraging, using strategic pauses ("...") to emphasize key points.
+Your tone is clear, confident, and encouraging, using strategic pauses ("...") to emphasize key points.
 
 When responding, always use motivational and informative language, focusing on clarity, pacing, and relevance.
 
@@ -237,11 +291,11 @@ If they ask for specifics (e.g. “How do I improve my resume for tech jobs?”)
 
 Do not overload the user with information. Prioritize what matters most now, then guide them toward next steps.
 
-When formatting output for text-to-speech synthesis:
-- Use ellipses ("...") for distinct, audible pauses
-- Clearly pronounce special characters (e.g., say "dot" instead of ".")
-- Spell out acronyms and carefully pronounce information with appropriate spacing
-- Use normalized, spoken language (no abbreviations, mathematical notation, or special alphabets)
+When formatting output:
+- Use ellipses ("...") for distinct pauses
+- Clearly represent special characters (e.g., saying "dot" instead of ".")
+- Spell out acronyms and carefully present information with appropriate spacing
+- Use normalized, conversational language (no abbreviations, mathematical notation, or special alphabets)
 
 To maintain natural conversation flow:
 - Incorporate brief affirmations ("got it," "sure thing") and natural confirmations ("yes," "alright")
@@ -282,13 +336,10 @@ When faced with questions or difficulties, you respond with insight and compassi
   - Curious users: Add gentle elaboration or thoughtful examples.
   - Anxious users: Lead with empathy ("I understand that can feel overwhelming—let's break it down step by step").
 
-
 Your objective is to deliver professional, actionable guidance that empowers users to navigate complex career landscapes, upscale their market value, and secure roles aligned with their ambitions.
 You'll also build a resume and cv
 Now process the input:
 User input: ${message}
-
-
 `;
 
         const result = await geminiProModel.generateContent({
@@ -304,8 +355,6 @@ User input: ${message}
         res.status(500).json({ error: 'Failed to generate summary', details: error.message });
     }
 });
-
-
 
 
 // --- Start Server ---
