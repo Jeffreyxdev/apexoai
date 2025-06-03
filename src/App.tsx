@@ -7,6 +7,7 @@ import Signup from "./Pages/Signup"
 import Waitlist from "./Pages/Waitlist"
 import Chatbot from "./Pages/Chatbot"
 import ResumeForm from "./InnerPage/ResumeForem"
+
 const App = () => {
   return (
     <div>
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/waitlist" element={<Waitlist/>}/>
          <Route path="/resume" element={<ResumeForm/>}/>
+         
          <Route path="/your-personal-ai" element={<Chatbot/>}/>
 
           <Route path="*" element={<NotFound />} />

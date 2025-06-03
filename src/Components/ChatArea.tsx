@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Send, Sparkles, Download } from 'lucide-react'; // Added Download icon
 import MessageBubble from './MessageBubble';
-
+import { PiPhoneCall } from "react-icons/pi";
 // Import for PDF generation
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ResumeDocument from './ResumeDocument'; // Your new ResumeDocument component
 import type{ ResumeData } from '../Components/types/resume'; // Your resume data types
-
+import{ Link } from 'react-router-dom';
 interface ChatAreaProps {
   chatId: string | null;
   onToggleSidebar: () => void;
@@ -226,32 +226,51 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-gray-100 p-6 bg-white/80 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto relative">
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="What is on your mind..."
-            className="w-full p-4 pr-14 border text-black border-b-blue-800 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200"
-            rows={1}
-            style={{ minHeight: '56px', maxHeight: '200px' }}
-            disabled={isLoading}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!message.trim() || isLoading}
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2.5 bg-grey-500 text-[#000] rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
-          >
-            {isLoading ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-b-blue-800"></div> : <Send size={16} />}
-          </button>
-        </div>
-        <p className="text-xs text-gray-500 mt-3 text-center">
-          ApaxoAI can make mistakes. Check important info.
-        </p>
-      </div>
+     {/* Input Area */}
+<div className="border-t border-gray-100 p-6 bg-white/80 backdrop-blur-xl">
+  <div className="max-w-4xl mx-auto relative">
+    <div className="relative">
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={handleKeyPress}
+        placeholder="What is on your mind..."
+        className="w-full p-4 pr-20 border text-black border-b-blue-800 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-all duration-200"
+        rows={1}
+        style={{ minHeight: '56px', maxHeight: '200px' }}
+        disabled={isLoading}
+      />
+     
+
+      {/* Send button */}
+      <button
+        onClick={handleSendMessage}
+        disabled={!message.trim() || isLoading}
+        className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2.5 bg-grey-500 text-[#000] rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
+      >
+        {isLoading ? (
+          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-b-blue-800"></div>
+        ) : (
+          <Send size={16} />
+        )}
+         
+      {/* Phone icon */}
+     
+      <PiPhoneCall
+        className="absolute right-12 top-1/2 transform -translate-y-1/2 text-black cursor-pointer hover:text-blue-600 transition "
+        size={24}
+      > <Link to={'https://elevenlabs.io/app/talk-to?agent_id=agent_01jwtxv08bexrt4f6yqvxyyx83'}> </Link> </PiPhoneCall>
+      </button>
+
+      
     </div>
+
+    <p className="text-xs text-gray-500 mt-3 text-center">
+      ApexoAI can make mistakes. Check important info.
+    </p>
+  </div>
+</div>
+</div>
   );
 };
 
