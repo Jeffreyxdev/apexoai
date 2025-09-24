@@ -1,27 +1,47 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "chat.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "dev": "nodemon chat.js",
+    "scrape": "python3 job_scraper.py",
     "build": "echo 'No build step needed for plain Express.js'"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ai",
+    "career",
+    "resume",
+    "job-scraper",
+    "canvas",
+    "pdf",
+    "documents",
+    "apexoai"
+  ],
+  "author": "Jeffrey Agabaenwere",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google-cloud/aiplatform": "^5.7.0",
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.9.0",
+    "better-sqlite3": "^12.4.1",
     "body-parser": "^2.2.0",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "docx": "^8.2.2",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "firebase-admin": "^13.4.0",
+    "multer": "^2.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
     "nodemon": "^3.1.10",
+    "pdfkit": "^0.14.0",
+    "pptxgenjs": "^3.12.0",
     "puppeteer": "^24.9.0"
   }
 }

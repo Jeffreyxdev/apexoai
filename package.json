@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-alpha.8",
     "@emotion/react": "^11.14.0",
@@ -26,6 +27,7 @@
     "framer-motion": "^12.12.1",
     "lucide-react": "^0.511.0",
     "pdfjs-dist": "^5.2.133",
+    "pdfkit": "^0.17.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-error-boundary": "^6.0.0",

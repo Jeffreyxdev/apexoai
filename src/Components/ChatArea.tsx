@@ -32,11 +32,24 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
     setResumeData(null); // Clear resume data when chat changes
   }, [chatId]);
 
-  useEffect(() => {
-    if (chatAreaRef.current) {
-      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
+ useEffect(() => {
+  if (chatAreaRef.current) {
+    const el = chatAreaRef.current;
+    const start = el.scrollTop;
+    const end = el.scrollHeight;
+    const duration = 1000; // 1s scroll duration
+    let startTime: number | null = null;
+
+    const animate = (time: number) => {
+      if (!startTime) startTime = time;
+      const progress = Math.min((time - startTime) / duration, 1);
+      el.scrollTop = start + (end - start) * progress;
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  }
+}, [messages, resumeData]);
 
   // Function to convert Markdown asterisks and hashtags to bold/italic HTML
   const convertMarkdownToHtml = (text: string): string => {
@@ -71,80 +84,114 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
     return null;
   };
 
-  const handleSendMessage = async () => {
-    if (message.trim()) {
-      setIsLoading(true);
-      const userMessage: Message = {
-        id: Date.now().toString() + '-user',
-        type: 'user',
-        content: message,
-        timestamp: new Date(),
-      };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setMessage('');
-      setResumeData(null); // Clear previous resume data on new message
 
-      try {
-        const response = await fetch('https://apexoai.onrender.com/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: message }),
-        });
+const handleSendMessage = async () => {
+  if (message.trim()) {
+    setIsLoading(true);
+    const userMessage: Message = {
+      id: Date.now().toString() + '-user',
+      type: 'user',
+      content: message,
+      timestamp: new Date(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMessage('');
+    setResumeData(null); // Clear previous resume data on new message
 
-        if (!response.ok) {
-          console.error('Error sending message:', response.status);
-          const errorMessage: Message = {
-            id: Date.now().toString() + '-error',
-            type: 'assistant',
-            content: 'Failed to get AI response.',
-            timestamp: new Date(),
-          };
-          setMessages((prevMessages) => [...prevMessages, errorMessage]);
-        } else {
-          const data = await response.json();
+    try {
+      // Detect if user wants a file output
+      const lowerMsg = message.toLowerCase();
+      const wantsPDF = lowerMsg.includes("pdf");
+      const wantsDocx = lowerMsg.includes("word") || lowerMsg.includes("docx");
+      const wantsExcel = lowerMsg.includes("excel") || lowerMsg.includes("spreadsheet");
+      const wantsPPT = lowerMsg.includes("ppt") || lowerMsg.includes("presentation");
 
-          // Attempt to parse as resume data
-          const parsedResume = parseResumeFromAiResponse(data);
+      // Step 1: Ask AI for structured content first
+      const response = await fetch('https://apexoai.onrender.com/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
 
-          if (parsedResume) {
-            setResumeData(parsedResume); // Store the structured resume data
-            const assistantMessage: Message = {
-              id: Date.now().toString() + '-assistant',
-              type: 'assistant',
-              content: "I've generated a resume for you! Click the button below to download it.",
-              timestamp: new Date(),
-            };
-            setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-          } else {
-            // Fallback to text message, applying Markdown conversion
-            const rawAiContent = data.enhancedSummary || 'No response from AI.';
-            const formattedAiContent = convertMarkdownToHtml(rawAiContent);
-
-            const assistantMessage: Message = {
-              id: Date.now().toString() + '-assistant',
-              type: 'assistant',
-              content: formattedAiContent,
-              timestamp: new Date(),
-            };
-            setMessages((prevMessages) => [...prevMessages, assistantMessage]);
-          }
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
+      if (!response.ok) {
+        console.error('Error sending message:', response.status);
         const errorMessage: Message = {
           id: Date.now().toString() + '-error',
           type: 'assistant',
-          content: 'Something went wrong while communicating with the AI.',
+          content: 'Failed to get AI response.',
           timestamp: new Date(),
         };
         setMessages((prevMessages) => [...prevMessages, errorMessage]);
-      } finally {
-        setIsLoading(false);
+        return;
       }
+
+      const data = await response.json();
+      const rawAiContent = data.enhancedSummary || 'No response from AI.';
+
+      // Step 2: If user asked for an office file, call backend generator
+      if (wantsPDF || wantsDocx || wantsExcel || wantsPPT) {
+        let endpoint = '';
+        let fileLabel = '';
+
+        if (wantsPDF) {
+          endpoint = '/pdf/generate';
+          fileLabel = 'PDF';
+        } else if (wantsDocx) {
+          endpoint = '/docx/generate';
+          fileLabel = 'Word Document';
+        } else if (wantsExcel) {
+          endpoint = '/excel/generate';
+          fileLabel = 'Excel Spreadsheet';
+        } else if (wantsPPT) {
+          endpoint = '/ppt/generate';
+          fileLabel = 'PowerPoint Presentation';
+        }
+
+        const fileRes = await fetch(`https://apexoai.onrender.com${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: rawAiContent,
+            filename: `apexo-${Date.now()}`,
+          }),
+        });
+
+        const fileData = await fileRes.json();
+
+        const assistantMessage: Message = {
+          id: Date.now().toString() + '-assistant',
+          type: 'assistant',
+          content: `Here’s your ${fileLabel}: <a href="${fileData.url}" target="_blank" class="text-blue-500 underline">Download</a>`,
+          timestamp: new Date(),
+        };
+
+        setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      } else {
+        // Normal AI text response
+        const formattedAiContent = convertMarkdownToHtml(rawAiContent);
+        const assistantMessage: Message = {
+          id: Date.now().toString() + '-assistant',
+          type: 'assistant',
+          content: formattedAiContent,
+          timestamp: new Date(),
+        };
+        setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorMessage: Message = {
+        id: Date.now().toString() + '-error',
+        type: 'assistant',
+        content: 'Something went wrong while communicating with the AI.',
+        timestamp: new Date(),
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
+};
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
@@ -175,56 +222,59 @@ const ChatArea: React.FC<ChatAreaProps> = ({ chatId, onToggleSidebar, isSidebarO
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-5">
-        <div className="max-w-4xl mx-auto space-y-6 ">
-          {messages.map((msg) => (
-            <MessageBubble key={msg.id} message={msg} />
-          ))}
+     <div
+  ref={chatAreaRef}
+  className="flex-1 overflow-y-auto p-5"
+>
+  <div className="max-w-4xl mx-auto space-y-6 ">
+    {messages.map((msg) => (
+      <MessageBubble key={msg.id} message={msg} />
+    ))}
 
-          {/* PDF Download Link conditional render */}
-          {resumeData && (
-            <div className="flex justify-start mb-8">
-              <div className="flex items-start gap-4 max-w-4xl w-full">
-                <div className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles size={16} className="text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-50 p-6 rounded-2xl rounded-tl-lg border border-gray-100">
-                    <p className="text-gray-800 leading-relaxed m-0">
-                      I've structured a professional resume for you. Click below to download!
-                    </p>
-                    <div className="mt-4 text-center">
-                      <PDFDownloadLink
-                        document={<ResumeDocument data={resumeData} />}
-                        fileName={`Resume_${resumeData.name.replace(/\s+/g, '_') || 'Generated'}.pdf`}
-                      >
-                        {({ blob, url, loading, error }) => (
-                          <button
-                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={loading}
-                          >
-                            {loading ? (
-                              <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                                Generating PDF...
-                              </>
-                            ) : (
-                              <>
-                                <Download size={16} /> Download Resume
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </PDFDownloadLink>
-                    </div>
-                  </div>
-                </div>
+    {/* PDF Download Link conditional render */}
+    {resumeData && (
+      <div className="flex justify-start mb-8">
+        <div className="flex items-start gap-4 max-w-4xl w-full">
+          <div className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+            <Sparkles size={16} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="bg-gray-50 p-6 rounded-2xl rounded-tl-lg border border-gray-100">
+              <p className="text-gray-800 leading-relaxed m-0">
+                I've structured a professional resume for you. Click below to download!
+              </p>
+              <div className="mt-4 text-center">
+                <PDFDownloadLink
+                  document={<ResumeDocument data={resumeData} />}
+                  fileName={`Resume_${resumeData.name.replace(/\s+/g, '_') || 'Generated'}.pdf`}
+                >
+                  {({ loading }) => (
+                    <button
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} /> Download Resume
+                        </>
+                      )}
+                    </button>
+                  )}
+                </PDFDownloadLink>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
+    )}
+  </div>
+</div>
+
 
      {/* Input Area */}
 <div className="border-t border-gray-100 p-6 bg-white/80 backdrop-blur-xl">
