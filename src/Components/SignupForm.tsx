@@ -65,8 +65,8 @@ const SignupForm = () => {
       <h2 className="text-2xl font-bold text-white mb-2">Sign Up Account</h2>
       <p className="text-gray-400 mb-6">Enter your personal data to create your account.</p>
       
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <SocialButton icon={IoLogoGoogle} label="Google" />
+      <div className="grid grid-cols-2 gap-4 mb-6 ">
+        <SocialButton  icon={IoLogoGoogle} label="Google" />
         <SocialButton icon={IoLogoLinkedin} label="linkedin" />
       </div>
       
@@ -140,7 +140,7 @@ const SignupForm = () => {
         
         <button 
           type="submit" 
-          className="w-full mt-4 bg-purple-light hover:bg-purple text-white"
+          className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition"
         >
           Sign Up
         </button>

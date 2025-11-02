@@ -2,14 +2,14 @@
 import Logo from "../Components/Logo";
 import SignupStepper from "../Components/SignupStepper";
 import SignupForm from "../Components/SignupForm";
-import bg from '../assets/bg.png'
+import bg from '../assets/fade.jpg'
 const Signup = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left section with gradient */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-purple flex-col p-10">
         <img
-    className="absolute inset-0 bg-cover bg-center filter blur-sm brightness-75 z-0 h-[100vh] w-[50vw]"
+    className="absolute inset-0 bg-cover bg-center filter blur-xs brightness-75 z-0 h-[100vh] w-[50vw]"
    src={bg}
   />
         <Logo  className="z-10"/>
