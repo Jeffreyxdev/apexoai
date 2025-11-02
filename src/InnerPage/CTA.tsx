@@ -13,7 +13,7 @@ const CTA: React.FC = () => {
         <p className="text-xl mb-10 max-w-2xl mx-auto">
           Join thousands of professionals who have already found their perfect job match with Apexoai.
         </p>
-        <button className="bg-white text-blue-700 hover:bg-gray-100 rounded-full px-8 py-6 text-lg font-medium inline-flex items-center">
+        <button className="bg-white text-blue-700 hover:bg-gray-100 rounded-full px-7 py-4 text-lg font-medium inline-flex items-center">
           Get Started Today <ArrowRight className="ml-2 h-5 w-5" />
         </button>
       </div>
