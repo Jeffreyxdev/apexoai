@@ -1,19 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import bgimg from '../assets/apexo back page.jpg'
+import bgimg from '../assets/bg.png'
 const HeroSection: React.FC = () => {
   return (
     <div className="relative   bg-gradient-to-t from-[#030015] to-[#0c0722] pt-25 overflow-hidden">
       <div className="absolute bottom-0 inset-0 rounded-[50px] bgc"><img src={bgimg} alt=""  className="bng  object-contain"/></div>
       <div className="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center min-h-[90vh]  text-white text-center space-y-4 sm:flex">
         <h1 className="text-8xl sm:text-5xl font-bold tracking-tight ">
-          Introducing Apexoai
+          Introducing ApexoAI
         </h1>
         <p className="text-lg sm:text-xl text-gray-30l">
           Revolutionizing Careers with Smart Resume and Job Matching
         </p>
-        <button className="bg-white btn text-blue-700 hover:bg-gray-100 rounded-full  text-lg font-medium flex items-center"><Link to='/your-personal-ai'>
-          Get employed ↗</Link>
+        <button className="bg-white btn text-blue-700 hover:bg-gray-100 rounded-full  text-lg font-medium flex items-center"><Link to='/waitlist'>
+          Request demo ↗</Link>
         </button>
 
         <div className="mt-24 container bg-white/10 backdrop-blur-sm rounded-2xl p-10 w-full max-w-4xl max-h-4xl sm:flex">

@@ -98,6 +98,18 @@ h1 {
 .btn:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
 
 @media (prefers-color-scheme: light) {
   :root {

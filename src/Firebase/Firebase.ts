@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.API_KEY,
-  authDomain: "apexo-ai.firebaseapp.com",
-  projectId: "apexo-ai",
-  storageBucket: "apexo-ai.firebasestorage.app",
-  messagingSenderId: "852713527633",
+  authDomain: "apexoai-1.firebaseapp.com",
+  projectId: "apexoai-1",
+  storageBucket: import.meta.env.STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.SENDERID,
   appId: import.meta.env.APP_ID,
-  measurementId: "G-D6QLVNHCVE"
+  measurementId: "G-YJH9P1RWM0"
 };
 
 // Initialize Firebase

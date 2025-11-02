@@ -1,57 +1,103 @@
-import { AnimatePresence, motion,  } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { MdOutlineClose } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
 import { itemVariants, sideVariants } from "../Utils/Motion";
 import { Link } from "react-router-dom";
 
-import Logo from '../assets/logo.png'
 
- 
+
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
- return (
+
+  return (
     <>
-     <nav className="hidden sm:flex container nav h-[45px] mt-3 w-[90%] fixed justify-between items-center p-4 text-black bg-white/90 rounded-full max-w-6xl mx-auto z-50 backdrop-blur-sm">
+      {/* Desktop Navbar */}
+      <nav
+        className={`hidden sm:flex fixed left-1/2 transform -translate-x-1/2 justify-between items-center px-6 z-50 backdrop-blur-sm shadow-lg transition-all duration-300 ${
+          isScrolled
+            ? "top-0 w-full max-w-full rounded-none bg-black/70 backdrop-blur-sm text-white h-[60px]"
+            : "top-3 w-[90%] max-w-6xl rounded-full bg-white/10 backdrop-blur-sm text-white h-[45px]"
+        }`}
+      >
         <div className="flex items-center space-x-2">
-          
           <span className="text-xl font-bold">ApexoAI</span>
         </div>
 
         <div className="flex space-x-6 text-sm font-medium">
-          <a href="#">Use Cases</a>
-          <a href="#">Features</a>
-          <a href="#">Resources</a>
-          <a href="#">Pricing</a>
-          <a href="#">About</a>
+          <a href="#" className={`transition ${isScrolled ? "hover:text-gray-300 text-bold" : "hover:text-gray-600"}`}>
+            Use Cases
+          </a>
+          <a href="#" className={`transition ${isScrolled ? "hover:text-gray-300 text-bold" : "hover:text-gray-600"}`}>
+            Features
+          </a>
+          <a href="#" className={`transition ${isScrolled ? "hover:text-gray-300 text-bold" : "hover:text-gray-600"}`}>
+            Resources
+          </a>
+          <a href="#" className={`transition ${isScrolled ? "hover:text-gray-300 text-bold" : "hover:text-gray-600"}`}>
+            Pricing
+          </a>
+          <a href="#" className={`transition ${isScrolled ? "hover:text-gray-300 text-bold" : "hover:text-gray-600"}`}>
+            About
+          </a>
         </div>
 
         <div className="flex space-x-3">
           <Link to="/signup">
-            <button className="bg-black text-white rounded-full h-10 px-4 hover:opacity-80 transition">Sign Up</button>
+            <button
+              className={`rounded-full h-10 px-4 hover:opacity-80 transition text-sm ${
+                isScrolled ? "bg-white text-black" : "bg-black text-white"
+              }`}
+            >
+              Sign Up
+            </button>
           </Link>
-          <button className="bg-black text-white rounded-full h-10 px-4 hover:opacity-80 transition">Log In</button>
+          <Link to={'/login'}>
+          <button
+            className={`rounded-full h-10 px-4 hover:opacity-80 transition text-sm ${
+              isScrolled ? "bg-white text-black" : "bg-black text-white"
+            }`}
+          >
+            Log In
+          </button></Link>
         </div>
       </nav>
-     {/* Mobile Nav Toggle */}
-      <nav className="md:hidden flex justify-center fixed z-20  w-full h-[8vh] backdrop-blur-sm">
-        <div className="nav-container pt-5 flex justify-between w-[90%]">
-         <h3 className="text-white text-2xl font-semibold mt-[-2vh] ml-[-3vw]  inline-block rounded ">Apexo AI</h3>
-          <div onClick={handleMobileMenuToggle}>
+
+      {/* Mobile Nav Toggle */}
+      <nav
+        className={`sm:hidden flex fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
+          isScrolled ? "h-16 bg-black" : "h-16 bg-white/10 backdrop-blur-sm"
+        }`}
+      >
+        <div className="flex justify-between items-center w-[90%] mx-auto">
+          <h3 className={`text-2xl font-semibold transition-colors ${isScrolled ? "text-white" : "text-white"}`}>
+            Apexo AI
+          </h3>
+          <button onClick={handleMobileMenuToggle} className="p-2">
             {isMobileMenuOpen ? (
-              <MdOutlineClose className="w-[40px] h-[40px] p-2 cursor-pointer mt-[-2vh]" />
+              <MdOutlineClose className="w-8 h-8 text-white" />
             ) : (
-              <div className="flex justify-center items-center h-[100%] pb-9">
-                <IoMdMenu className="w-[40px] h-[40px] p-2 cursor-pointer " />
-              </div>
+              <IoMdMenu className="w-8 h-8 text-white" />
             )}
-          </div>
+          </button>
         </div>
       </nav>
 
@@ -59,9 +105,10 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.aside
+            className="fixed top-16 right-0 z-40"
             style={{ overflow: "hidden" }}
             initial={{ width: 0 }}
-            animate={{ width: 500 }}
+            animate={{ width: "60vw" }}
             exit={{
               width: 0,
               transition: { delay: 0.3, duration: 0.1 },
@@ -72,38 +119,36 @@ const Navbar = () => {
               animate="open"
               exit="closed"
               variants={sideVariants}
-              className="container md:hidden flex flex-col fixed bg-[#ffffff] text-black w-[60vw] ml-[35vw] mt-[10vh] h-[350px] mr-[-4vw] z-20  rounded-2xl pt-4 "
+              className="bg-white text-black w-full rounded-l-2xl shadow-xl p-6"
             >
-              <ul className="text-[20px] mr-[-20px] p-5" onClick={handleMobileMenuToggle}>
-                <motion.li variants={itemVariants} className="mb-6">
-                  <Link to="/">Home</Link>
+              <ul className="text-lg space-y-6" onClick={handleMobileMenuToggle}>
+                <motion.li variants={itemVariants}>
+                  <Link to="/" className="hover:text-blue-400 transition">Home</Link>
                 </motion.li>
-                <motion.li variants={itemVariants} className="mb-6">
-                  <Link to="/">Features</Link>
+                <motion.li variants={itemVariants}>
+                  <Link to="/" className="hover:text-blue-400 transition">Features</Link>
                 </motion.li>
-                <motion.li variants={itemVariants} className="mb-6">
-                  <Link to="/">Pricing</Link>
+                <motion.li variants={itemVariants}>
+                  <Link to="/" className="hover:text-blue-400 transition">Pricing</Link>
                 </motion.li>
-                <motion.li variants={itemVariants} className="mb-6">
-                  Contact
+                <motion.li variants={itemVariants}>
+                  <a href="#" className="hover:text-blue-400 transition">Contact</a>
                 </motion.li>
               </ul>
 
               <Link to="/waitlist">
                 <motion.button
                   variants={itemVariants}
-                  className="w-[190px] h-[48px]  bg-blue-400  text-white rounded-xl text-[14px] ml-5"
+                  className="w-full mt-8 h-12 bg-blue-400 text-white rounded-xl hover:bg-blue-500 transition"
                 >
                   Request Demo
                 </motion.button>
               </Link>
-
-      
             </motion.div>
           </motion.aside>
         )}
       </AnimatePresence>
-      </>
+    </>
   );
 };
 

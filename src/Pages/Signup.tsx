@@ -2,7 +2,7 @@
 import Logo from "../Components/Logo";
 import SignupStepper from "../Components/SignupStepper";
 import SignupForm from "../Components/SignupForm";
-import bg from '../assets/Reflect.jpg'
+import bg from '../assets/bg.png'
 const Signup = () => {
   return (
     <div className="flex min-h-screen">
