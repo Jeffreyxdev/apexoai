@@ -1,17 +1,25 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String },
-    credits: { type: Number, default: 10 },
-    plan: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
-    googleId: { type: String },
+const userSchema = new mongoose.Schema({
+  firstname: { type: String, required: true },
+  lastname: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  credits: { type: Number, default: 100 },
+  plan: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
+  isActive: { type: Boolean, default: true },
+  tokens: {
+    aiCredits: { type: Number, default: 100 }
   },
-  { timestamps: true }
-);
+  googleId: { type: String },
+}, { timestamps: true });
+
+// Add premium check
+userSchema.methods.isPremium = function() {
+  return this.plan === 'pro' || this.plan === 'enterprise';
+};
+
 
 // Password encryption middleware
 userSchema.pre('save', async function (next) {
@@ -25,6 +33,8 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+
 
 const User = mongoose.model('User', userSchema);
 export default User;

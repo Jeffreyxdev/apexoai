@@ -64,12 +64,26 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
+
+
+console.log('--- ROUTE REGISTRATION START ---');
+
+app._router && app._router.stack.forEach(r => {
+  if (r.route) console.log(r.route.path);
+  else if (r.name === 'router' && r.handle.stack) {
+    r.handle.stack.forEach(layer => {
+      if (layer.route) console.log(layer.route.path);
+    });
+  }
+});
+
+console.log('--- ROUTE REGISTRATION END ---');
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -84,7 +98,7 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -100,7 +114,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Request logging
 app.use(requestLogger);
 
-// Rate limiting
+
+// --- Limiters ---
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -115,38 +130,38 @@ const strictLimiter = rateLimit({
   message: 'AI request limit exceeded. Please upgrade your plan.',
 });
 
-app.use('/api/', limiter);
-app.use('/api/chat', strictLimiter);
-app.use('/api/resume/generate', strictLimiter);
-app.use('/api/cover-letter/generate', strictLimiter);
+// --- Global Rate Limiter ---
+app.use('/api', limiter);
 
-// Health check endpoint
+// --- Health Check ---
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
   });
 });
 
-// API Routes
+// --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/resumes', resumeRoutes);
-app.use('/api/cover-letters', coverLetterRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/resumes', strictLimiter, resumeRoutes);         // apply stricter limiter here
+app.use('/api/cover-letters', strictLimiter, coverLetterRoutes);
+app.use('/api/chat', strictLimiter, chatRoutes);              // chat is AI-heavy
 app.use('/api/jobs', jobRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
 
+
 // Socket.IO initialization
 initSocketHandlers(io);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
+
   res.status(404).json({
     success: false,
     message: 'Route not found',
