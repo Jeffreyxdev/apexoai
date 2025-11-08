@@ -61,7 +61,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const data = await res.json();
         setUser(data);
       } else {
-        // token invalid or expired
         setUser(null);
         setToken(null);
       }
@@ -77,15 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (token) fetchProfile(token);
     else setIsLoadingUser(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  // wrapper to include Authorization header automatically
   const authFetch = async (input: RequestInfo, init?: RequestInit) => {
     const currentToken = token || localStorage.getItem('apexoai_token');
-    if (!currentToken) {
-      return Promise.reject(new Error('No auth token'));
-    }
+    if (!currentToken) return Promise.reject(new Error('No auth token'));
 
     const headers = new Headers(init?.headers || {});
     if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${currentToken}`);

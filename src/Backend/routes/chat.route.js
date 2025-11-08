@@ -5,147 +5,94 @@ import User from '../models/user.model.js';
 import { protect, checkCredits } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validation.js';
 import aiService from '../service/ai.service.js';
-import { cacheService } from '../config/redis.js';
 
 const router = express.Router();
 
-// @route   POST /api/chat/sessions
-// @desc    Create new chat session
-// @access  Private
+// POST /api/chat/sessions
 router.post('/sessions', protect, async (req, res) => {
   try {
     const { title, context } = req.body;
 
     const session = await ChatSession.create({
-      userId: req.user._id || req.user.id,
+      userId: req.user._id,
       title: title || 'New Conversation',
       context: context || { type: 'general' }
     });
 
-    res.status(201).json({
-      success: true,
-      session
-    });
+    res.status(201).json({ success: true, session });
   } catch (error) {
-    console.error('Create session error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create chat session'
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// @route   GET /api/chat/sessions
-// @desc    Get all user chat sessions
-// @access  Private
+// GET /api/chat/sessions
 router.get('/sessions', protect, async (req, res) => {
   try {
-    const { status = 'active', limit = 20, page = 1 } = req.query;
+    const { limit = 20, page = 1 } = req.query;
+    const skip = (parseInt(String(page)) - 1) * parseInt(String(limit));
 
     const sessions = await ChatSession.find({
-      userId: req.user._id || req.user.id,
-      status
+      userId: req.user._id,
+      status: 'active'
     })
       .sort({ 'metadata.lastMessageAt': -1 })
-      .limit(parseInt(limit))
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .select('-messages'); // Don't send full messages in list view
+      .skip(skip)
+      .limit(parseInt(String(limit)))
+      .select('title metadata.lastMessageAt metadata.totalMessages context.type');
 
-    const total = await ChatSession.countDocuments({
-      userId: req.user._id || req.user.id,
-      status
-    });
+    const total = await ChatSession.countDocuments({ userId: req.user._id, status: 'active' });
 
     res.json({
       success: true,
       sessions,
-      pagination: {
-        total,
-        page: parseInt(page),
-        pages: Math.ceil(total / parseInt(limit))
-      }
+      pagination: { total, page: parseInt(String(page)), pages: Math.ceil(total / parseInt(String(limit))) }
     });
   } catch (error) {
-    console.error('Get sessions error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch chat sessions'
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// @route   GET /api/chat/sessions/:id
-// @desc    Get specific chat session with messages
-// @access  Private
+// GET /api/chat/sessions/:id
 router.get('/sessions/:id', protect, async (req, res) => {
   try {
     const session = await ChatSession.findOne({
       _id: req.params.id,
-      userId: req.user._id || req.user.id
+      userId: req.user._id
     });
 
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        message: 'Chat session not found'
-      });
-    }
+    if (!session) return res.status(404).json({ success: false, message: 'Session not found' });
 
-    res.json({
-      success: true,
-      session
-    });
+    res.json({ success: true, session });
   } catch (error) {
-    console.error('Get session error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch chat session'
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// @route   POST /api/chat/sessions/:id/messages
-// @desc    Send message and get AI response
-// @access  Private
+// POST /api/chat/sessions/:id/messages
 router.post('/sessions/:id/messages', [
   protect,
   checkCredits(1),
-  body('message').trim().notEmpty().withMessage('Message is required'),
+  body('message').trim().notEmpty(),
   validateRequest
 ], async (req, res) => {
   try {
     const { message, context } = req.body;
     const sessionId = req.params.id;
 
-    // Get or create session
-    let session = await ChatSession.findOne({
-      _id: sessionId,
-      userId: req.user._id || req.user.id
-    });
+    let session = await ChatSession.findOne({ _id: sessionId, userId: req.user._id });
+    if (!session) return res.status(404).json({ success: false, message: 'Session not found' });
 
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        message: 'Chat session not found'
-      });
-    }
-
-    // Add user message
     await session.addMessage('user', message);
 
-    // Prepare AI context from conversation history
     const conversationContext = session.getAIContext(10);
-    
-    // Add system context based on session type
     const systemPrompt = getSystemPrompt(session.context.type, context);
-    
+
     const messages = [
       { role: 'system', content: systemPrompt },
       ...conversationContext,
       { role: 'user', content: message }
     ];
 
-    // Set up SSE for streaming
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -153,182 +100,38 @@ router.post('/sessions/:id/messages', [
     let fullResponse = '';
     let tokenCount = 0;
 
-    // Stream AI response
     await aiService.chatStream(
       messages,
       (chunk) => {
         fullResponse += chunk;
         res.write(`data: ${JSON.stringify({ chunk, type: 'content' })}\n\n`);
       },
-      {
-        model: 'gemini-1.5-pro',
-        temperature: 0.7,
-        maxTokens: 2000
-      }
+      { model: 'gemini-1.5-pro', temperature: 0.7 }
     );
 
-    // Estimate tokens
     tokenCount = aiService.estimateTokens(message + fullResponse);
+    await session.addMessage('assistant', fullResponse, { model: 'gemini-1.5-pro', totalTokens: tokenCount });
 
-    // Save AI response
-    await session.addMessage('assistant', fullResponse, {
-      model: 'gemini-2.0-pro',
-      totalTokens: tokenCount
-    });
-
-    // Deduct credits if not premium
     if (!req.hasUnlimitedCredits) {
-      const user = await User.findById(req.user._id || req.user.id);
-      await user.deductCredits(req.creditsRequired);
-      
-      res.write(`data: ${JSON.stringify({ 
-        type: 'credits',
-        remaining: user.tokens.aiCredits 
-      })}\n\n`);
+      const user = await User.findById(req.user._id);
+      await user.deductCredits(1);
+      res.write(`data: ${JSON.stringify({ type: 'credits', remaining: user.tokens.aiCredits })}\n\n`);
     }
 
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     res.end();
 
   } catch (error) {
-    console.error('Chat message error:', error);
-    
     if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to process message',
-        error: error.message
-      });
+      res.status(500).json({ success: false, message: error.message });
     } else {
-      res.write(`data: ${JSON.stringify({ 
-        type: 'error', 
-        message: error.message 
-      })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`);
       res.end();
     }
   }
 });
 
-// @route   DELETE /api/chat/sessions/:id
-// @desc    Delete chat session
-// @access  Private
-router.delete('/sessions/:id', protect, async (req, res) => {
-  try {
-    const session = await ChatSession.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        userId: req.user._id || req.user.id
-      },
-      { status: 'deleted' },
-      { new: true }
-    );
-
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        message: 'Chat session not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Chat session deleted successfully'
-    });
-  } catch (error) {
-    console.error('Delete session error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete chat session'
-    });
-  }
-});
-
-// @route   PATCH /api/chat/sessions/:id
-// @desc    Update chat session (title, archive, etc.)
-// @access  Private
-router.patch('/sessions/:id', protect, async (req, res) => {
-  try {
-    const { title, status } = req.body;
-    const updates = {};
-
-    if (title) updates.title = title;
-    if (status) updates.status = status;
-
-    const session = await ChatSession.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        userId: req.user._id || req.user.id
-      },
-      updates,
-      { new: true, runValidators: true }
-    );
-
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        message: 'Chat session not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      session
-    });
-  } catch (error) {
-    console.error('Update session error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update chat session'
-    });
-  }
-});
-
-// @route   POST /api/chat/quick
-// @desc    Quick AI chat without session (one-off questions)
-// @access  Private
-router.post('/quick', [
-  protect,
-  checkCredits(1),
-  body('message').trim().notEmpty().withMessage('Message is required'),
-  validateRequest
-], async (req, res) => {
-  try {
-    const { message, context } = req.body;
-
-    const systemPrompt = getSystemPrompt('general', context);
-    
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: message }
-    ];
-
-    const response = await aiService.chat(messages, {
-      model: 'gemini-2.0-pro',
-      temperature: 0.7
-    });
-
-    // Deduct credits
-    if (!req.hasUnlimitedCredits) {
-      const user = await User.findById(req.user._id || req.user.id);
-      await user.deductCredits(req.creditsRequired);
-    }
-
-    res.json({
-      success: true,
-      response: response.content,
-      usage: response.usage
-    });
-
-  } catch (error) {
-    console.error('Quick chat error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to process message'
-    });
-  }
-});
-
-// Helper function to get system prompts based on context
+// Helper: System prompts
 function getSystemPrompt(contextType, additionalContext = {}) {
   const basePrompt = `You are ApexoAI, an advanced AI career assistant specializing in:
 - Resume writing and optimization
@@ -341,7 +144,7 @@ function getSystemPrompt(contextType, additionalContext = {}) {
 You provide practical, actionable advice with a professional yet friendly tone.
 You use data and best practices to support your recommendations.`;
 
-  const contextPrompts = {
+  const prompts = {
     general: basePrompt,
     resume_building: `${basePrompt}\n\nYou are currently helping the user build or optimize their resume. Focus on:
 - ATS optimization
@@ -370,13 +173,11 @@ You use data and best practices to support your recommendations.`;
 - Professional growth
 - Work-life balance`
   };
-
-  let prompt = contextPrompts[contextType] || contextPrompts.general;
-
-  if (additionalContext && Object.keys(additionalContext).length > 0) {
-    prompt += `\n\nAdditional context: ${JSON.stringify(additionalContext, null, 2)}`;
+  
+  let prompt = prompts[contextType] || prompts.general;
+  if (Object.keys(additionalContext).length) {
+    prompt += `\nContext: ${JSON.stringify(additionalContext)}`;
   }
-
   return prompt;
 }
 
